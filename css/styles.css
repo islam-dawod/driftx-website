@@ -63,6 +63,7 @@ html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+  .cursor-dot, .cursor-ring { display: none !important; }
 }
 
 body {
@@ -143,7 +144,7 @@ ul { list-style: none; }
   transform: translate(-50%, -50%);
   will-change: transform;
 }
-.cursor-dot { width: 6px; height: 6px; background: var(--brand); }
+.cursor-dot { display: none; } /* native cursor stays visible; ring is an additive accent */
 .cursor-ring {
   width: 34px; height: 34px;
   border: 1.5px solid rgba(255,255,255,0.35);
@@ -166,12 +167,8 @@ ul { list-style: none; }
 .cursor-ring.is-hover .cursor-label { opacity: 1; }
 @media (max-width: 900px), (pointer: coarse) {
   .cursor-dot, .cursor-ring { display: none; }
-  body { cursor: auto; }
 }
-@media (hover: hover) and (pointer: fine) {
-  body { cursor: none; }
-  a, button { cursor: none; }
-}
+/* Native cursor is always visible; the ring is a subtle trailing accent only. */
 
 /* ==========================================================================
    Navigation
