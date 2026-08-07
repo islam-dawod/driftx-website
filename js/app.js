@@ -12,9 +12,10 @@
   /* ---------- i18n ---------- */
   const I18N = window.DRIFTX_I18N || {};
   const RTL = { he: true, ar: true };
+  const PAGE = window.PAGE_I18N || {};
   function applyLang(lang) {
-    const dict = I18N[lang] || I18N.en || {};
-    const fallback = I18N.en || {};
+    const dict = Object.assign({}, I18N[lang] || {}, PAGE[lang] || {});
+    const fallback = Object.assign({}, I18N.en || {}, PAGE.en || {});
     $$("[data-i18n]").forEach((el) => {
       const key = el.getAttribute("data-i18n");
       const val = dict[key] != null ? dict[key] : fallback[key];
