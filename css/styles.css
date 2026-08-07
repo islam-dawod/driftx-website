@@ -956,3 +956,69 @@ h1, h2, h3, h4 { line-height: 1.08; letter-spacing: -0.025em; font-weight: 800; 
 .universe { margin-top: 10px; }
 .universe-img { width: 100%; height: auto; display: block; border-radius: 22px; }
 @media (max-width: 640px) { .universe-img { border-radius: 16px; } }
+
+/* ==========================================================================
+   RTL TYPE SYSTEMS — designed in Hebrew (Heebo) & Arabic (Alexandria),
+   not translated. Relaxed tracking, calmer weight, more air.
+   ========================================================================== */
+
+/* Font family per language */
+html[lang="he"] body, html[lang="he"] input, html[lang="he"] textarea,
+html[lang="he"] select, html[lang="he"] button { font-family: "Heebo", var(--font); }
+html[lang="ar"] body, html[lang="ar"] input, html[lang="ar"] textarea,
+html[lang="ar"] select, html[lang="ar"] button { font-family: "Alexandria", var(--font); }
+
+/* Hero headline: English rotator (LTR) vs. art-directed RTL line */
+.build-rtl { display: none; }
+[dir="rtl"] .build { display: none; }
+[dir="rtl"] .build-rtl { display: block; }
+
+/* Display headings — never copy the aggressive English tracking to RTL */
+[dir="rtl"] .giant, [dir="rtl"] .mega, [dir="rtl"] .h-display,
+[dir="rtl"] .h1, [dir="rtl"] .h2, [dir="rtl"] .h3,
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3,
+[dir="rtl"] .what2__head, [dir="rtl"] .world__lines,
+[dir="rtl"] .footer__stand, [dir="rtl"] .build-rtl {
+  letter-spacing: 0; line-height: 1.15; font-weight: 800;
+}
+
+/* Hebrew: a hair tighter leading, minimal negative tracking */
+[lang="he"] .giant, [lang="he"] .mega, [lang="he"] .build-rtl,
+[lang="he"] .what2__head, [lang="he"] h1, [lang="he"] h2 {
+  letter-spacing: -0.01em; line-height: 1.08;
+}
+
+/* Arabic (Alexandria): connected script — normal tracking, more leading, cap weight at 800 */
+[lang="ar"] .giant, [lang="ar"] .mega, [lang="ar"] .build-rtl,
+[lang="ar"] .what2__head, [lang="ar"] h1, [lang="ar"] h2,
+[lang="ar"] .footer__stand, [lang="ar"] .world__lines {
+  letter-spacing: 0; line-height: 1.2; font-weight: 800;
+}
+[lang="ar"] .brandline { letter-spacing: .1em; }
+
+/* Fluid RTL heading sizes — smaller & wider than the EN giants (2–3 lines) */
+[dir="rtl"] .hero2 .build-rtl { font-size: clamp(40px, 6vw, 92px); }
+[dir="rtl"] .mega { font-size: clamp(34px, 5vw, 66px); }
+[dir="rtl"] .what2__head { font-size: clamp(30px, 4.2vw, 54px); max-width: 20ch; }
+[dir="rtl"] .h1 { font-size: clamp(30px, 4vw, 56px); }
+
+/* Body — significantly more breathing room */
+[dir="rtl"] .lead, [dir="rtl"] p { line-height: 1.85; }
+[dir="rtl"] .lead { font-weight: 400; font-size: clamp(17px, 1.4vw, 20px); max-width: 72ch; }
+[dir="rtl"] .hero2 .lead { max-width: 46ch; }
+[dir="rtl"] .what2__lead { max-width: 46ch; }
+
+/* Buttons / nav / tags — medium weight, relaxed tracking (no 900) */
+[dir="rtl"] .btn, [dir="rtl"] .btn-talk, [dir="rtl"] .world__more, [dir="rtl"] .verb,
+[dir="rtl"] .chip, [dir="rtl"] .nav__links a, [dir="rtl"] .lang button, [dir="rtl"] .eyebrow {
+  letter-spacing: 0; font-weight: 600;
+}
+
+/* Mobile RTL — dedicated sizes; keep 2–3 line headings, never one word per line */
+@media (max-width: 640px) {
+  [dir="rtl"] .hero2 .build-rtl { font-size: clamp(34px, 10.5vw, 56px); line-height: 1.12; }
+  [dir="rtl"] .mega, [dir="rtl"] .what2__head { font-size: clamp(28px, 8.5vw, 44px); }
+  [dir="rtl"] .h1 { font-size: clamp(27px, 8vw, 42px); }
+  [dir="rtl"] .lead { font-size: 16.5px; line-height: 1.8; }
+  [dir="rtl"] .world__label { font-size: clamp(40px, 14vw, 66px); }
+}

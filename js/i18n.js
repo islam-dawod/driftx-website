@@ -122,6 +122,8 @@ window.DRIFTX_I18N = {
     "contact.submit": "Start The Conversation", "contact.note": "We'll get back to you within one business day.",
 
     "hero.lead": "We help businesses sell better, market smarter, and use technology & AI to move ahead.",
+    "hero.rtl1": "We don't wait for the future.",
+    "hero.rtl2": "We build it.",
     "w.sales": "Better people. Better process. More sales.",
     "w.mkt": "Not more leads. Better ones.",
     "w.biz": "Find the problem. Fix the system.",
@@ -273,6 +275,8 @@ window.DRIFTX_I18N = {
     "contact.submit": "בוא נתחיל שיחה", "contact.note": "נחזור אליך תוך יום עסקים אחד.",
 
     "hero.lead": "אנחנו עוזרים לעסקים למכור טוב יותר, לשווק חכם יותר ולהשתמש בטכנולוגיה ו-AI כדי להתקדם.",
+    "hero.rtl1": "לא מחכים לעתיד.",
+    "hero.rtl2": "בונים אותו.",
     "w.sales": "אנשים טובים יותר. תהליך טוב יותר. יותר מכירות.",
     "w.mkt": "לא יותר לידים. טובים יותר.",
     "w.biz": "למצוא את הבעיה. לתקן את המערכת.",
@@ -424,6 +428,8 @@ window.DRIFTX_I18N = {
     "contact.submit": "لنبدأ الحوار", "contact.note": "سنعاود التواصل خلال يوم عمل واحد.",
 
     "hero.lead": "نساعد الأعمال على البيع بشكل أفضل، والتسويق بذكاء، واستخدام التقنية والذكاء الاصطناعي للتقدّم.",
+    "hero.rtl1": "لا ننتظر المستقبل.",
+    "hero.rtl2": "نحن نبنيه.",
     "w.sales": "أشخاص أفضل. عملية أفضل. مبيعات أكثر.",
     "w.mkt": "ليس عملاء أكثر. بل أفضل.",
     "w.biz": "اكتشف المشكلة. أصلِح النظام.",
