@@ -812,3 +812,51 @@ h1, h2, h3, h4 { line-height: 1.08; letter-spacing: -0.025em; font-weight: 800; 
 .sysviz .f2 { animation: floaty 9.5s ease-in-out infinite; animation-delay: -3s; }
 .sysviz .f3 { animation: floaty 7.5s ease-in-out infinite; animation-delay: -1.5s; }
 .sysviz .f4 { animation: floaty 10s ease-in-out infinite; animation-delay: -4s; }
+
+/* ==========================================================================
+   DriftX miniature world — cinematic scene cards (masonry, editorial)
+   Drop real renders into assets/scenes/<name>.jpg to replace placeholders.
+   ========================================================================== */
+.lego-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 200px; gap: 16px; margin-top: 40px; }
+.lego {
+  position: relative; overflow: hidden; border-radius: 20px; display: block;
+  border: 1px solid var(--stroke); background: var(--bg-2);
+  transition: transform .4s var(--ease), border-color .4s, box-shadow .4s;
+}
+.lego:hover { border-color: var(--stroke-strong); box-shadow: 0 22px 50px rgba(0,0,0,.4); }
+.lego__media { position: absolute; inset: 0; overflow: hidden; }
+.lego__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; transition: transform .6s var(--ease); }
+.lego:hover .lego__media img { transform: scale(1.05); }
+/* placeholder (shown until a real render is dropped in) */
+.lego__ph { position: absolute; inset: 0; display: grid; place-items: center; transition: transform .6s var(--ease);
+  background:
+    radial-gradient(120% 90% at 70% 15%, color-mix(in srgb, var(--accent) 40%, transparent), transparent 60%),
+    linear-gradient(150deg, var(--bg-3), var(--bg-1)); }
+.lego:hover .lego__ph { transform: scale(1.05); }
+.lego__ph svg { width: 46%; max-width: 150px; filter: drop-shadow(0 10px 24px rgba(0,0,0,.5)); opacity: .92; }
+.lego__ph .tag { position: absolute; top: 14px; left: 14px; font-size: 10px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ink-4); border: 1px solid var(--stroke); padding: 4px 9px; border-radius: 999px; }
+.lego__cap { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 20px 22px;
+  background: linear-gradient(transparent, rgba(6,9,18,.85) 70%); }
+.lego__cap h4 { font-size: clamp(18px,2vw,24px); font-weight: 800; letter-spacing: -.01em; }
+.lego__cap p { font-size: 14px; color: var(--ink-2); margin-top: 2px; }
+.lego__cap .u { width: 36px; height: 3px; border-radius: 2px; background: var(--accent); margin-top: 10px; }
+
+/* editorial spans */
+.lego--ai      { grid-column: span 2; grid-row: span 2; }
+.lego--sales   { grid-column: span 2; }
+.lego--build   { grid-column: span 1; }
+.lego--train   { grid-column: span 1; }
+.lego--analyze { grid-column: span 2; }
+.lego--grow    { grid-column: span 2; }
+
+@media (max-width: 860px) {
+  .lego-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 170px; }
+  .lego--ai { grid-column: span 2; grid-row: span 2; }
+  .lego--sales, .lego--analyze, .lego--grow { grid-column: span 2; }
+  .lego--build, .lego--train { grid-column: span 1; }
+}
+@media (max-width: 520px) {
+  .lego-grid { grid-template-columns: 1fr; }
+  .lego { grid-column: auto !important; grid-row: auto !important; min-height: 190px; }
+}
