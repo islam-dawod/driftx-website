@@ -784,3 +784,31 @@ h1, h2, h3, h4 { line-height: 1.08; letter-spacing: -0.025em; font-weight: 800; 
 .tile-a { background: linear-gradient(140deg, rgba(255,46,126,.25), rgba(168,85,247,.18)); }
 .tile-b { background: linear-gradient(140deg, rgba(46,125,255,.22), rgba(34,211,238,.16)); }
 .tile-c { background: linear-gradient(140deg, rgba(198,255,58,.20), rgba(255,212,0,.16)); }
+
+/* ==========================================================================
+   WHAT WE REALLY DO — calm, premium, 60/40 with a subtle system visual
+   ========================================================================== */
+.what2 { min-height: 82vh; display: flex; align-items: center; }
+.what2__grid { display: grid; grid-template-columns: 58% 42%; gap: clamp(28px, 5vw, 64px); align-items: center; width: 100%; }
+.what2 .eyebrow { margin-bottom: 30px; }
+.what2__head { font-size: clamp(31px, 4.3vw, 60px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.06; max-width: 16ch; }
+.what2__lead { max-width: 660px; margin-top: 22px; line-height: 1.75; }
+@media (max-width: 900px) {
+  .what2 { min-height: auto; }
+  .what2__grid { grid-template-columns: 1fr; gap: 40px; }
+  .what2__head { max-width: 100%; }
+}
+
+/* system visualization */
+.sysviz { width: 100%; height: auto; overflow: visible; }
+.sysviz .node-c { fill: rgba(255,255,255,0.05); stroke: rgba(255,255,255,0.16); stroke-width: 1.5; }
+.sysviz .node-glow { fill: var(--accent); opacity: 0.12; filter: blur(9px); }
+.sysviz text { fill: var(--ink-2); font-weight: 700; font-size: 14px; }
+.sysviz .conn { stroke: var(--accent); fill: none; stroke-width: 1.5; opacity: 0.38;
+  stroke-dasharray: 440; stroke-dashoffset: 440; transition: stroke-dashoffset 1.8s var(--ease-out); }
+.reveal.in .sysviz .conn { stroke-dashoffset: 0; }
+.sysviz .dot { fill: var(--accent); }
+.sysviz .f1 { animation: floaty 8s ease-in-out infinite; }
+.sysviz .f2 { animation: floaty 9.5s ease-in-out infinite; animation-delay: -3s; }
+.sysviz .f3 { animation: floaty 7.5s ease-in-out infinite; animation-delay: -1.5s; }
+.sysviz .f4 { animation: floaty 10s ease-in-out infinite; animation-delay: -4s; }
