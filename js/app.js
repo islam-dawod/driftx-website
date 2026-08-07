@@ -362,9 +362,25 @@
     }, { threshold: 0.3 });
     io.observe(stage);
 
+    const isMobile = window.matchMedia("(max-width: 640px)").matches;
     if (reduce) {
       media.style.clipPath = "circle(72% at 50% 50%)";
       if (overlay) overlay.style.opacity = "0";
+    } else if (isMobile) {
+      // CSS frames the video vertically; offer tap-to-unmute instead of the scroll circle
+      if (video) {
+        const hint = document.createElement("div");
+        hint.className = "film__tap"; hint.textContent = "Tap for sound";
+        stage.appendChild(hint);
+        const toggle = () => {
+          video.muted = !video.muted;
+          if (!video.muted) video.play().catch(() => {});
+          hint.textContent = video.muted ? "Tap for sound" : "Sound on";
+        };
+        media.style.cursor = "pointer";
+        media.addEventListener("click", toggle);
+        hint.addEventListener("click", (e) => { e.stopPropagation(); toggle(); });
+      }
     } else {
       let fticking = false;
       const onFilm = () => {
