@@ -66,7 +66,7 @@
   <main id="top">
     <!-- ===================== HERO ===================== -->
     <section class="hero2" id="hero">
-      <div class="hero2__x" id="heroX" aria-hidden="true"><img src="assets/media/office-x.png" alt=""></div>
+      <div class="hero2__engine" id="heroEngine" aria-hidden="true"><canvas id="engine"></canvas></div>
       <div class="container" style="position:relative;z-index:2">
         <div style="max-width:900px">
           <div class="brandline reveal">DRIFTX</div>
@@ -136,8 +136,39 @@
             <a href="sales-consulting/" class="world__more" data-cursor="Sell"><span data-i18n="more">Learn more</span> →</a>
           </div>
           <div class="world__media reveal" data-delay="1">
-            <img src="assets/media/office-x.png" alt="DriftX sales workspace" loading="lazy">
-            <span class="sticker sticker-float" style="top:6%;left:2%" aria-hidden="true">SELL SMARTER</span>
+            <div class="scene-wrap">
+              <svg class="scene" viewBox="0 0 600 460" role="img" aria-label="DriftX sales system">
+                <ellipse class="stage-glow" cx="300" cy="410" rx="220" ry="28"/>
+                <g class="float2">
+                  <rect class="glass" x="120" y="250" width="360" height="150" rx="18"/>
+                  <rect class="acc" x="146" y="276" width="60" height="10" rx="5"/>
+                  <rect class="glass-2" x="146" y="300" width="308" height="80" rx="10"/>
+                  <polyline class="acc-s" style="stroke-width:3" points="160,362 214,342 262,348 312,318 362,300 424,266"/>
+                  <rect class="acc2" x="172" y="346" width="15" height="24" rx="3"/>
+                  <rect class="acc2" x="232" y="336" width="15" height="34" rx="3"/>
+                  <rect class="acc2" x="292" y="320" width="15" height="50" rx="3"/>
+                  <rect class="acc2" x="352" y="300" width="15" height="70" rx="3"/>
+                </g>
+                <g class="float">
+                  <rect class="glass" x="86" y="118" width="184" height="112" rx="14"/>
+                  <circle class="acc" cx="118" cy="150" r="13"/>
+                  <rect class="ink-3" x="140" y="143" width="96" height="8" rx="4"/>
+                  <rect class="ink-3" x="140" y="160" width="60" height="7" rx="3.5" opacity="0.6"/>
+                  <rect class="glass-2" x="108" y="184" width="140" height="30" rx="8"/>
+                  <rect class="acc" x="118" y="195" width="70" height="8" rx="4"/>
+                </g>
+                <g class="float3">
+                  <circle class="acc-s" style="stroke-width:3" cx="442" cy="150" r="40"/>
+                  <circle class="acc-s" style="stroke-width:3" cx="442" cy="150" r="22"/>
+                  <circle class="acc" cx="442" cy="150" r="8"/>
+                </g>
+                <path class="acc" d="M300 84 l26 40 h-16 v42 h-20 v-42 h-16 z"/>
+                <path class="dash dashmove" d="M270 175 H362"/>
+                <circle class="acc pulse" cx="150" cy="86" r="4"/>
+                <circle class="acc2 pulse2" cx="512" cy="250" r="4"/>
+              </svg>
+            </div>
+            <span class="sticker sticker-float" style="top:2%;left:2%" aria-hidden="true">SELL SMARTER</span>
           </div>
         </div>
       </div>
@@ -153,7 +184,32 @@
             <a href="marketing/" class="world__more" data-cursor="Reach"><span data-i18n="more">Learn more</span> →</a>
           </div>
           <div class="world__media reveal" data-delay="1">
-            <img src="assets/media/person-gradient.png" alt="DriftX marketing" loading="lazy">
+            <div class="scene-wrap">
+              <svg class="scene" viewBox="0 0 600 460" role="img" aria-label="DriftX marketing funnel">
+                <ellipse class="stage-glow" cx="300" cy="410" rx="220" ry="28"/>
+                <g class="float2">
+                  <circle class="ink-3" cx="150" cy="70" r="6"/><circle class="ink-3" cx="300" cy="58" r="6"/>
+                  <circle class="ink-3" cx="450" cy="70" r="6"/><circle class="ink-3" cx="222" cy="88" r="5"/><circle class="ink-3" cx="378" cy="88" r="5"/>
+                </g>
+                <path class="glass" d="M130 128 H470 L368 298 H232 Z"/>
+                <path class="acc" d="M130 128 H470 L442 174 H158 Z" opacity="0.9"/>
+                <path class="acc2" d="M232 298 H368 L348 336 H252 Z"/>
+                <circle class="acc pulse" cx="262" cy="206" r="5"/><circle class="acc pulse2" cx="322" cy="228" r="5"/><circle class="acc pulse" cx="300" cy="188" r="5"/>
+                <g class="float">
+                  <circle class="glass" cx="300" cy="388" r="34"/>
+                  <circle class="acc" cx="300" cy="376" r="11"/>
+                  <path class="acc" d="M278 406 a22 22 0 0 1 44 0 z"/>
+                </g>
+                <g class="float3">
+                  <rect class="glass" x="438" y="216" width="128" height="74" rx="12"/>
+                  <path class="acc" d="M468 250 l32 -14 v46 l-32 -14 z"/>
+                  <rect class="acc2" x="500" y="244" width="36" height="24" rx="5"/>
+                  <path class="acc-s" style="stroke-width:3;stroke-linecap:round" d="M544 240 q10 12 0 32"/>
+                </g>
+                <path class="dash dashmove" d="M118 250 H62"/>
+                <circle class="acc2 pulse2" cx="96" cy="150" r="4"/>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -169,7 +225,28 @@
             <a href="business-consulting/" class="world__more" data-cursor="Explore"><span data-i18n="more">Learn more</span> →</a>
           </div>
           <div class="world__media reveal" data-delay="1">
-            <img src="assets/media/team-meeting.png" alt="DriftX business consulting" loading="lazy" style="border-radius:20px">
+            <div class="scene-wrap">
+              <svg class="scene" viewBox="0 0 600 460" role="img" aria-label="DriftX business machine">
+                <ellipse class="stage-glow" cx="300" cy="410" rx="220" ry="28"/>
+                <g class="float2">
+                  <rect class="glass" x="150" y="150" width="300" height="205" rx="20"/>
+                  <rect class="glass-2" x="176" y="178" width="80" height="60" rx="10"/>
+                  <rect class="acc" x="270" y="178" width="80" height="60" rx="10" opacity="0.9"/>
+                  <rect class="glass-2" x="364" y="178" width="60" height="60" rx="10"/>
+                  <rect class="glass-2" x="176" y="256" width="118" height="72" rx="10"/>
+                  <rect class="acc2" x="308" y="256" width="116" height="72" rx="10" opacity="0.9"/>
+                </g>
+                <circle class="acc-s spin" cx="206" cy="124" r="26" style="stroke-width:12;stroke-dasharray:6 13"/>
+                <circle class="acc-s spin-r" cx="256" cy="98" r="17" style="stroke-width:9;stroke-dasharray:5 11"/>
+                <g class="float3">
+                  <circle class="acc-s" style="stroke-width:5" cx="432" cy="300" r="34"/>
+                  <line class="acc-s" style="stroke-width:8;stroke-linecap:round" x1="455" y1="323" x2="488" y2="356"/>
+                  <path d="M416 300 l11 13 20 -27" style="fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round;stroke-linejoin:round"/>
+                </g>
+                <circle class="acc pulse" cx="118" cy="300" r="4"/>
+                <circle class="acc2 pulse2" cx="470" cy="140" r="4"/>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -185,8 +262,33 @@
             <a href="web-development/" class="world__more" data-cursor="Open"><span data-i18n="more">Learn more</span> →</a>
           </div>
           <div class="world__media reveal" data-delay="1">
-            <img src="assets/media/card-2.png" alt="DriftX technology &amp; systems" loading="lazy" style="border-radius:20px">
-            <span class="sticker sticker--blue sticker-float" style="bottom:8%;left:4%" aria-hidden="true">BUILT DIFFERENT</span>
+            <div class="scene-wrap">
+              <svg class="scene" viewBox="0 0 600 460" role="img" aria-label="DriftX systems &amp; technology">
+                <ellipse class="stage-glow" cx="300" cy="405" rx="220" ry="28"/>
+                <g class="float2">
+                  <rect class="glass" x="110" y="120" width="340" height="235" rx="16"/>
+                  <path class="glass-2" d="M110 136 a16 16 0 0 1 16 -16 h308 a16 16 0 0 1 16 16 v20 H110 Z"/>
+                  <circle class="acc" cx="138" cy="138" r="5"/><circle class="acc2" cx="158" cy="138" r="5"/><circle class="ink-3" cx="178" cy="138" r="5"/>
+                  <rect class="ink-3" x="140" y="182" width="120" height="8" rx="4" opacity="0.6"/>
+                  <rect class="ink-3" x="140" y="198" width="80" height="8" rx="4" opacity="0.4"/>
+                  <rect class="acc" x="150" y="252" width="24" height="72" rx="4"/>
+                  <rect class="acc2" x="190" y="222" width="24" height="102" rx="4"/>
+                  <rect class="acc" x="230" y="272" width="24" height="52" rx="4"/>
+                  <circle class="acc-s" style="stroke-width:16" cx="372" cy="248" r="42"/>
+                  <path class="acc" d="M372 248 V206 A42 42 0 0 1 409 268 Z"/>
+                </g>
+                <g class="float">
+                  <rect class="glass" x="474" y="196" width="92" height="172" rx="16"/>
+                  <rect class="acc" x="490" y="220" width="60" height="10" rx="5"/>
+                  <rect class="glass-2" x="490" y="240" width="60" height="42" rx="8"/>
+                  <rect class="acc2" x="490" y="292" width="40" height="10" rx="5"/>
+                </g>
+                <path class="dash dashmove" d="M450 250 H474"/>
+                <circle class="acc pulse" cx="100" cy="110" r="5"/>
+                <circle class="acc2 pulse2" cx="520" cy="150" r="5"/>
+              </svg>
+            </div>
+            <span class="sticker sticker--blue sticker-float" style="bottom:2%;left:2%" aria-hidden="true">BUILT DIFFERENT</span>
           </div>
         </div>
       </div>
@@ -204,8 +306,38 @@
             </div>
           </div>
           <div class="world__media reveal" data-delay="1">
-            <img src="assets/media/data-x.png" alt="DriftX AI" loading="lazy">
-            <span class="sticker sticker--acid sticker-float" style="top:2%;right:6%" aria-hidden="true">HUMANS + MACHINES</span>
+            <div class="scene-wrap">
+              <svg class="scene" viewBox="0 0 600 460" role="img" aria-label="DriftX AI hub">
+                <ellipse class="stage-glow" cx="300" cy="405" rx="220" ry="28"/>
+                <g class="line" style="stroke:var(--accent);opacity:.4">
+                  <line x1="300" y1="240" x2="140" y2="120"/><line x1="300" y1="240" x2="470" y2="120"/>
+                  <line x1="300" y1="240" x2="120" y2="330"/><line x1="300" y1="240" x2="480" y2="330"/>
+                </g>
+                <g class="float2">
+                  <rect class="glass" x="70" y="92" width="120" height="58" rx="12"/>
+                  <text x="130" y="126" text-anchor="middle" font-size="18" font-weight="800" fill="var(--ink)">CRM</text>
+                </g>
+                <g class="float3">
+                  <rect class="glass" x="410" y="92" width="130" height="58" rx="12"/>
+                  <text x="475" y="126" text-anchor="middle" font-size="17" font-weight="800" fill="var(--ink)">Calls</text>
+                </g>
+                <g class="float3">
+                  <rect class="glass" x="60" y="302" width="120" height="58" rx="12"/>
+                  <text x="120" y="336" text-anchor="middle" font-size="17" font-weight="800" fill="var(--ink)">Data</text>
+                </g>
+                <g class="float2">
+                  <rect class="glass" x="418" y="302" width="140" height="58" rx="12"/>
+                  <text x="488" y="336" text-anchor="middle" font-size="16" font-weight="800" fill="var(--ink)">Dashboards</text>
+                </g>
+                <g class="float">
+                  <path class="glass" d="M300 158 l64 37 v74 l-64 37 -64 -37 v-74 z"/>
+                  <path class="acc" d="M300 186 l40 23 v46 l-40 23 -40 -23 v-46 z" opacity="0.92"/>
+                  <path class="ink" d="M300 210 l6 22 22 6 -22 6 -6 22 -6 -22 -22 -6 22 -6 z"/>
+                </g>
+                <circle class="acc pulse" cx="300" cy="240" r="86" style="fill:none;stroke:var(--accent);stroke-width:1.5;opacity:.25"/>
+              </svg>
+            </div>
+            <span class="sticker sticker--acid sticker-float" style="top:2%;right:4%" aria-hidden="true">HUMANS + MACHINES</span>
           </div>
         </div>
       </div>
@@ -268,15 +400,23 @@
         <div class="trendlist reveal" data-delay="2" aria-hidden="true">
           <span>AI</span><span>Consumer behaviour</span><span>Social platforms</span><span>Digital design</span><span>Commerce</span><span>Automation</span><span>Brand culture</span><span>Creative trends</span>
         </div>
-        <div class="trendwall reveal" data-delay="1">
-          <figure class="t-wide t-tall"><img src="assets/media/statue.png" alt="Culture meets technology" loading="lazy"></figure>
-          <figure><img src="assets/media/person-gradient.png" alt="" loading="lazy"></figure>
-          <figure class="t-tall"><img src="assets/media/callcenter.png" alt="" loading="lazy"></figure>
+        <div class="trendwall reveal" data-delay="1" aria-hidden="true">
+          <figure class="t-wide t-tall tile-a t-scene">
+            <svg viewBox="0 0 200 200"><g stroke="rgba(255,255,255,.28)" stroke-width="2"><line x1="50" y1="60" x2="120" y2="45"/><line x1="120" y1="45" x2="155" y2="120"/><line x1="50" y1="60" x2="85" y2="140"/><line x1="85" y1="140" x2="155" y2="120"/></g><circle cx="50" cy="60" r="11" fill="var(--pink)"/><circle cx="120" cy="45" r="11" fill="var(--yellow)"/><circle cx="155" cy="120" r="11" fill="var(--blue)"/><circle cx="85" cy="140" r="11" fill="var(--acid)"/></svg>
+          </figure>
+          <figure class="t-word" style="background:var(--pink);color:#0b0b0b">AI</figure>
+          <figure class="t-tall tile-b t-scene">
+            <svg viewBox="0 0 120 200"><rect x="20" y="120" width="20" height="60" rx="4" fill="var(--yellow)"/><rect x="52" y="90" width="20" height="90" rx="4" fill="var(--pink)"/><rect x="84" y="60" width="20" height="120" rx="4" fill="var(--blue)"/></svg>
+          </figure>
           <figure class="t-word">DRIFTX</figure>
-          <figure><img src="assets/media/char-woman.png" alt="" loading="lazy"></figure>
-          <figure class="t-wide"><img src="assets/media/data-x.png" alt="" loading="lazy" style="object-fit:contain;background:transparent"></figure>
-          <figure><img src="assets/media/Ellipse-7.png" alt="" loading="lazy"></figure>
-          <figure><img src="assets/media/Ellipse-6-2.png" alt="" loading="lazy"></figure>
+          <figure class="tile-c t-scene">
+            <svg viewBox="0 0 120 120"><path d="M60 22 l9 29 29 9 -29 9 -9 29 -9 -29 -29 -9 29 -9 z" fill="#0b0b0b"/></svg>
+          </figure>
+          <figure class="t-wide t-word" style="background:linear-gradient(120deg,var(--blue),var(--purple));color:#fff;font-size:clamp(22px,3vw,44px)">NEXT.</figure>
+          <figure class="t-word" style="background:var(--blue);color:#fff">×</figure>
+          <figure class="tile-a t-scene">
+            <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="34" fill="none" stroke="var(--yellow)" stroke-width="8"/><path d="M60 60 V26 A34 34 0 0 1 90 74 Z" fill="var(--pink)"/></svg>
+          </figure>
         </div>
       </div>
     </section>
@@ -454,6 +594,7 @@
   </footer>
 
   <script src="js/i18n.js"></script>
+  <script src="js/engine.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

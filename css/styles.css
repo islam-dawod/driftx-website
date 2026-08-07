@@ -739,3 +739,48 @@ h1, h2, h3, h4 { line-height: 1.08; letter-spacing: -0.025em; font-weight: 800; 
 
 /* character floats */
 .char-float { position: absolute; z-index: 2; pointer-events: none; filter: drop-shadow(0 20px 40px rgba(0,0,0,.4)); }
+
+/* ==========================================================================
+   DriftX visual universe — vector "3D" scenes (no stock imagery)
+   ========================================================================== */
+.scene { width: 100%; height: auto; display: block; overflow: visible; }
+.scene .glass { fill: rgba(255,255,255,0.05); stroke: rgba(255,255,255,0.14); stroke-width: 1.5; }
+.scene .glass-2 { fill: rgba(255,255,255,0.03); stroke: rgba(255,255,255,0.10); stroke-width: 1.5; }
+.scene .ink { fill: var(--ink); }
+.scene .ink-3 { fill: var(--ink-3); }
+.scene .acc { fill: var(--accent); }
+.scene .acc2 { fill: var(--accent-2); }
+.scene .acc-s { stroke: var(--accent); fill: none; }
+.scene .line { stroke: rgba(255,255,255,0.18); fill: none; stroke-width: 1.5; }
+.scene .dash { stroke: var(--accent); fill: none; stroke-width: 2; stroke-dasharray: 4 6; stroke-linecap: round; }
+
+/* floating / motion (killed under reduced-motion by the global rule) */
+.scene .float  { animation: floaty 6s ease-in-out infinite; }
+.scene .float2 { animation: floaty 7.5s ease-in-out infinite; animation-delay: -2s; }
+.scene .float3 { animation: floaty 5.2s ease-in-out infinite; animation-delay: -1s; }
+@keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+.scene .spin { transform-box: fill-box; transform-origin: center; animation: spin 16s linear infinite; }
+.scene .spin-r { transform-box: fill-box; transform-origin: center; animation: spin 12s linear infinite reverse; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.scene .pulse { animation: pulseo 3s ease-in-out infinite; }
+.scene .pulse2 { animation: pulseo 2.2s ease-in-out infinite; animation-delay: -1s; }
+@keyframes pulseo { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
+.scene .dashmove { stroke-dasharray: 4 6; animation: dashmove 1.4s linear infinite; }
+@keyframes dashmove { to { stroke-dashoffset: -20; } }
+
+/* stage glow behind each scene */
+.scene .stage-glow { fill: var(--accent); opacity: .18; filter: blur(26px); }
+
+/* Scene wrapper gets mouse parallax via JS (--px/--py) */
+.world__media .scene-wrap { transition: transform .2s var(--ease); transform: translate(calc(var(--px,0) * 1px), calc(var(--py,0) * 1px)); }
+
+/* Hero engine canvas */
+#engine { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.hero2__engine { position: absolute; inset: 0; z-index: 0; will-change: transform, opacity; }
+
+/* trend wall vector tiles */
+.trendwall .t-scene { display: grid; place-items: center; padding: 14px; }
+.trendwall .t-scene svg { width: 100%; height: 100%; }
+.tile-a { background: linear-gradient(140deg, rgba(255,46,126,.25), rgba(168,85,247,.18)); }
+.tile-b { background: linear-gradient(140deg, rgba(46,125,255,.22), rgba(34,211,238,.16)); }
+.tile-c { background: linear-gradient(140deg, rgba(198,255,58,.20), rgba(255,212,0,.16)); }

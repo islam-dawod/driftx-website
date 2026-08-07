@@ -297,6 +297,24 @@
   const restart = $("#scanRestart");
   if (restart) restart.addEventListener("click", buildScan);
 
+  /* ---------- Scene mouse parallax ---------- */
+  if (!coarse && !reduce) {
+    $$(".world__media").forEach((box) => {
+      const wrap = $(".scene-wrap", box);
+      if (!wrap) return;
+      box.addEventListener("pointermove", (e) => {
+        const r = box.getBoundingClientRect();
+        const dx = (e.clientX - r.left - r.width / 2) / r.width;
+        const dy = (e.clientY - r.top - r.height / 2) / r.height;
+        wrap.style.setProperty("--px", (dx * 18).toFixed(1));
+        wrap.style.setProperty("--py", (dy * 18).toFixed(1));
+      });
+      box.addEventListener("pointerleave", () => {
+        wrap.style.setProperty("--px", 0); wrap.style.setProperty("--py", 0);
+      });
+    });
+  }
+
   /* ---------- Rotating words ---------- */
   function makeRotator(el, interval) {
     if (!el) return;
@@ -315,15 +333,15 @@
   makeRotator($("#contactRotator"), 1700);
   makeRotator($("#filmWords"), 700);
 
-  /* ---------- Hero X — zoom on scroll ---------- */
-  const heroX = $("#heroX"), heroEl = $("#hero");
+  /* ---------- Hero engine — zoom on scroll ---------- */
+  const heroX = $("#heroEngine"), heroEl = $("#hero");
   if (heroX && heroEl && !reduce) {
     let hticking = false;
     const onHero = () => {
       const h = heroEl.offsetHeight || 1;
       const p = Math.min(1, Math.max(0, window.scrollY / h));
-      heroX.style.transform = "translateY(-50%) scale(" + (1 + p * 1.9).toFixed(3) + ")";
-      heroX.style.opacity = (1 - p * 0.92).toFixed(3);
+      heroX.style.transform = "scale(" + (1 + p * 1.6).toFixed(3) + ")";
+      heroX.style.opacity = (1 - p * 0.85).toFixed(3);
       hticking = false;
     };
     window.addEventListener("scroll", () => { if (!hticking) { hticking = true; requestAnimationFrame(onHero); } }, { passive: true });
