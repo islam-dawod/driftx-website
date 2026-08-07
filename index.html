@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#070A14">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <meta property="og:title" content="DRIFTX — Business, Evolved.">
-  <meta property="og:description" content="We build businesses that sell, scale & evolve. Sales × Marketing × Technology × AI.">
+  <meta property="og:description" content="We build what's next. Sales × Marketing × Technology × AI.">
   <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,10 +16,7 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <!-- Living gradient-mesh background -->
-  <div class="mesh" aria-hidden="true"><div class="blob-3"></div><div class="grain"></div></div>
-
-  <!-- Custom cursor -->
+  <div class="mesh" aria-hidden="true"><div class="blob-3"></div><div class="blob-4"></div><div class="blob-5"></div><div class="grain"></div></div>
   <div class="cursor-dot" aria-hidden="true"></div>
   <div class="cursor-ring" aria-hidden="true"><span class="cursor-label"></span></div>
 
@@ -27,12 +24,11 @@
   <header class="nav" id="nav">
     <div class="nav__inner">
       <a href="#top" class="logo" aria-label="DriftX home">
-        <span>Drift</span>
-        <svg class="logo__x" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 2C52 30 70 48 98 50 70 52 52 70 50 98 48 70 30 52 2 50 30 48 48 30 50 2Z"/></svg>
+        <img class="logo__img" src="assets/brand/logo-mark.png" alt="DriftX" width="171" height="49">
       </a>
       <nav class="nav__links" aria-label="Primary">
         <a href="#what" data-i18n="nav.what">What We Do</a>
-        <a href="#solutions" data-i18n="nav.solutions">Solutions</a>
+        <a href="#worlds" data-i18n="nav.solutions">Solutions</a>
         <a href="#ai" data-i18n="nav.ai">AI</a>
         <a href="#work" data-i18n="nav.work">Work</a>
         <a href="#about" data-i18n="nav.about">About</a>
@@ -47,19 +43,17 @@
         </div>
         <a href="#contact" class="btn-talk" data-magnetic data-i18n="nav.talk">Let's Talk</a>
         <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
-          <span data-i18n="nav.menu">Menu</span>
-          <span class="bars"><span></span><span></span></span>
+          <span data-i18n="nav.menu">Menu</span><span class="bars"><span></span><span></span></span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Full-screen navigation -->
   <div class="fsnav" id="fsnav" aria-hidden="true">
     <button class="fsnav__close" id="fsnavClose" aria-label="Close menu">&times;</button>
     <nav class="fsnav__list" aria-label="Full screen">
       <a href="#what" style="--i:0"><span data-i18n="nav.what">What We Do</span></a>
-      <a href="#solutions" style="--i:1"><span data-i18n="nav.solutions">Solutions</span></a>
+      <a href="#worlds" style="--i:1"><span data-i18n="nav.solutions">Solutions</span></a>
       <a href="#ai" style="--i:2">AI <span class="fsnav__x">×</span> Automation</a>
       <a href="#work" style="--i:3"><span data-i18n="nav.work">Work</span></a>
       <a href="#about" style="--i:4"><span data-i18n="nav.about">About</span></a>
@@ -71,60 +65,54 @@
 
   <main id="top">
     <!-- ===================== HERO ===================== -->
-    <section class="hero" id="hero">
-      <canvas id="universe" aria-hidden="true"></canvas>
-      <div class="container hero__inner">
-        <div class="hero__grid">
-          <div>
-            <div class="eyebrow reveal" data-i18n="hero.eyebrow">The DriftX Business Engine</div>
-            <h1 class="h-display reveal" data-delay="1">
-              <span data-i18n="hero.title1">We Build Businesses</span><br>
-              <span class="gradient-text" data-i18n="hero.title2">That Perform.</span>
-            </h1>
-            <p class="hero__sub reveal" data-delay="2">
-              Sales <span class="x-mark">×</span> Marketing <span class="x-mark">×</span> Technology <span class="x-mark">×</span> AI
-            </p>
-            <p class="hero__text lead reveal" data-delay="3" data-i18n="hero.text">
-              DRIFTX helps businesses identify what's holding them back, build stronger sales and marketing systems, train their teams, and integrate technology and AI that measurably improves performance.
-            </p>
-            <div class="btn-row reveal" data-delay="4">
-              <a href="#what" class="btn btn--primary" data-cursor="Discover" data-i18n="hero.cta1">Discover DriftX</a>
-              <a href="#contact" class="btn btn--ghost" data-cursor="Let's Talk" data-i18n="hero.cta2">Talk About Your Business</a>
-            </div>
+    <section class="hero2" id="hero">
+      <div class="hero2__x" id="heroX" aria-hidden="true"><img src="assets/media/office-x.png" alt=""></div>
+      <div class="container" style="position:relative;z-index:2">
+        <div style="max-width:900px">
+          <div class="brandline reveal">DRIFTX</div>
+          <div class="evolved reveal" data-delay="1">Business, <b>Evolved.</b></div>
+          <h1 class="giant build reveal" data-delay="2">
+            We Build<br>
+            <span class="rotator" id="heroRotator">
+              <span class="w-next on">What's Next.</span>
+              <span class="w-sales">Sales.</span>
+              <span class="w-marketing">Marketing.</span>
+              <span class="w-business">Business.</span>
+              <span class="w-tech">Tech.</span>
+              <span class="w-ai">AI.</span>
+            </span>
+          </h1>
+          <p class="lead reveal" data-delay="3" style="margin:26px 0 32px;max-width:52ch" data-i18n="hero.lead">
+            We help businesses sell better, market smarter, and use technology &amp; AI to move ahead.
+          </p>
+          <div class="btn-row reveal" data-delay="4">
+            <a href="#worlds" class="btn btn--primary" data-cursor="Discover" data-i18n="hero.cta1">Discover DriftX</a>
+            <a href="#contact" class="btn btn--ghost" data-cursor="Let's Talk" data-i18n="hero.cta2">Talk About Your Business</a>
           </div>
         </div>
       </div>
-      <div class="hero__legend" aria-hidden="true" data-i18n="hero.legend">Move your cursor — every part of a business is connected.</div>
+      <span class="sticker sticker-float" style="top:22%;right:8%" aria-hidden="true">BORING DOESN'T SELL.</span>
+      <span class="sticker sticker--acid sticker-float" style="bottom:16%;right:22%" aria-hidden="true">YES, WE USE AI. A LOT.</span>
       <div class="hero__scroll" aria-hidden="true"><span class="line"></span><span data-i18n="hero.scroll">Scroll</span></div>
     </section>
 
-    <!-- Disciplines marquee -->
-    <div class="marquee" aria-hidden="true">
+    <!-- ===================== MARQUEE ===================== -->
+    <div class="marquee marquee--color" aria-hidden="true">
       <div class="marquee__track">
-        <span>Sales <b class="x-mark">×</b> Marketing <b class="x-mark">×</b> Business <b class="x-mark">×</b> Technology <b class="x-mark">×</b> AI <b class="x-mark">×</b></span>
-        <span>Sales <b class="x-mark">×</b> Marketing <b class="x-mark">×</b> Business <b class="x-mark">×</b> Technology <b class="x-mark">×</b> AI <b class="x-mark">×</b></span>
+        <span><b class="c1">Sales</b> × <b class="c2">Culture</b> × <b class="c3">AI</b> × <b class="c4">Marketing</b> × <b class="c5">Technology</b> × <b class="c6">People</b> × <b class="c1">Data</b> × <b class="c2">Ideas</b> × <b class="c3">Design</b> × <b class="c4">Business</b> × </span>
+        <span><b class="c1">Sales</b> × <b class="c2">Culture</b> × <b class="c3">AI</b> × <b class="c4">Marketing</b> × <b class="c5">Technology</b> × <b class="c6">People</b> × <b class="c1">Data</b> × <b class="c2">Ideas</b> × <b class="c3">Design</b> × <b class="c4">Business</b> × </span>
       </div>
     </div>
 
-    <!-- ===================== WHAT WE DO ===================== -->
+    <!-- ===================== WHAT (short) ===================== -->
     <section class="section" id="what">
-      <div class="container">
+      <div class="container container--narrow">
         <div class="eyebrow reveal" data-i18n="what.eyebrow">What We Really Do</div>
-        <h2 class="h1 reveal" data-delay="1">
-          <span data-i18n="what.title1">We Don't Sell Services.</span><br>
-          <span class="gradient-text" data-i18n="what.title2">We Solve Business Problems.</span>
-        </h2>
-        <p class="lead reveal" data-delay="2" style="margin-top:22px" data-i18n="what.lead">
-          Businesses rarely suffer from a single problem. DRIFTX looks at the whole picture — then acts.
+        <h2 class="mega reveal" data-delay="1"><span data-i18n="what2.title">You don't have one problem. You have a system.</span></h2>
+        <p class="lead reveal" data-delay="2" style="margin-top:24px" data-i18n="what2.lead">
+          Leads without sales. Sales without process. Tools nobody uses. We find what's actually broken — then fix the whole system.
         </p>
-        <div class="problems">
-          <div class="problem-row reveal"><span class="n">01</span><span data-i18n="what.p1">Sometimes there are leads, but no sales.</span></div>
-          <div class="problem-row reveal"><span class="n">02</span><span data-i18n="what.p2">Sometimes there's a sales team, but no process.</span></div>
-          <div class="problem-row reveal"><span class="n">03</span><span data-i18n="what.p3">Sometimes there's marketing, but the lead quality is low.</span></div>
-          <div class="problem-row reveal"><span class="n">04</span><span data-i18n="what.p4">Sometimes there are systems, but staff still do everything manually.</span></div>
-          <div class="problem-row reveal"><span class="n">05</span><span data-i18n="what.p5">And sometimes there just isn't enough data to see where the problem is.</span></div>
-        </div>
-        <div class="verbs reveal" data-delay="1">
+        <div class="verbs reveal" data-delay="2">
           <span class="verb" data-i18n="what.v1">We analyze.</span>
           <span class="verb" data-i18n="what.v2">We identify.</span>
           <span class="verb" data-i18n="what.v3">We build.</span>
@@ -135,265 +123,114 @@
       </div>
     </section>
 
-    <!-- ===================== SALES ===================== -->
-    <section class="section" id="solutions">
+    <!-- ===================== SERVICE WORLDS ===================== -->
+    <div id="worlds"></div>
+
+    <section class="world" data-world="sales">
+      <div class="world__glow" style="--gx:80%;--gy:20%"></div>
       <div class="container">
-        <div class="feature">
-          <div class="feature__body">
-            <div class="eyebrow reveal">Sales</div>
-            <h3 class="h2 feature__title reveal" data-delay="1">
-              <span data-i18n="sales.title1">Build a Sales System.</span><br>
-              <span class="cool-text" data-i18n="sales.title2">Not Just a Sales Team.</span>
-            </h3>
-            <p class="feature__text lead reveal" data-delay="2" data-i18n="sales.text">
-              DRIFTX builds, improves and coaches sales operations — for call centers, online sellers, physical stores and service providers. We examine the entire journey from interest to closed deal.
-            </p>
-            <ul class="chk reveal" data-delay="3">
-              <li data-i18n="sales.c1">Existing sales process & response speed</li>
-              <li data-i18n="sales.c2">Lead handling, needs discovery & objection handling</li>
-              <li data-i18n="sales.c3">Follow-up, closing & customer retention</li>
-              <li data-i18n="sales.c4">Employee performance & structured training</li>
-            </ul>
-            <div class="btn-row reveal" data-delay="4" style="margin-top:26px">
-              <a href="sales-consulting/" class="btn btn--ghost" data-cursor="Explore">Explore Sales</a>
-              <a href="sales-training/" class="btn btn--ghost" data-cursor="Explore">Sales Training</a>
+        <div class="world__grid">
+          <div class="reveal">
+            <div class="world__label">SALES</div>
+            <div class="world__lines" data-i18n="w.sales">Better people. Better process. More sales.</div>
+            <a href="sales-consulting/" class="world__more" data-cursor="Sell"><span data-i18n="more">Learn more</span> →</a>
+          </div>
+          <div class="world__media reveal" data-delay="1">
+            <img src="assets/media/office-x.png" alt="DriftX sales workspace" loading="lazy">
+            <span class="sticker sticker-float" style="top:6%;left:2%" aria-hidden="true">SELL SMARTER</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="world" data-world="marketing">
+      <div class="world__glow" style="--gx:20%;--gy:30%"></div>
+      <div class="container">
+        <div class="world__grid world--rev">
+          <div class="reveal">
+            <div class="world__label">MARKETING</div>
+            <div class="world__lines" data-i18n="w.mkt">Not more leads. Better ones.</div>
+            <a href="marketing/" class="world__more" data-cursor="Reach"><span data-i18n="more">Learn more</span> →</a>
+          </div>
+          <div class="world__media reveal" data-delay="1">
+            <img src="assets/media/person-gradient.png" alt="DriftX marketing" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="world" data-world="business">
+      <div class="world__glow" style="--gx:80%;--gy:30%"></div>
+      <div class="container">
+        <div class="world__grid">
+          <div class="reveal">
+            <div class="world__label">BUSINESS</div>
+            <div class="world__lines" data-i18n="w.biz">Find the problem. Fix the system.</div>
+            <a href="business-consulting/" class="world__more" data-cursor="Explore"><span data-i18n="more">Learn more</span> →</a>
+          </div>
+          <div class="world__media reveal" data-delay="1">
+            <img src="assets/media/team-meeting.png" alt="DriftX business consulting" loading="lazy" style="border-radius:20px">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="world" data-world="tech" id="work">
+      <div class="world__glow" style="--gx:20%;--gy:30%"></div>
+      <div class="container">
+        <div class="world__grid world--rev">
+          <div class="reveal">
+            <div class="world__label">TECH</div>
+            <div class="world__lines" data-i18n="w.tech">Build what your business actually needs.</div>
+            <a href="web-development/" class="world__more" data-cursor="Open"><span data-i18n="more">Learn more</span> →</a>
+          </div>
+          <div class="world__media reveal" data-delay="1">
+            <img src="assets/media/card-2.png" alt="DriftX technology &amp; systems" loading="lazy" style="border-radius:20px">
+            <span class="sticker sticker--blue sticker-float" style="bottom:8%;left:4%" aria-hidden="true">BUILT DIFFERENT</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="world" data-world="ai" id="ai">
+      <div class="world__glow" style="--gx:80%;--gy:30%"></div>
+      <div class="container">
+        <div class="world__grid">
+          <div class="reveal">
+            <div class="world__label">AI</div>
+            <div class="world__lines" data-i18n="w.ai">Less repetitive work. More intelligence.</div>
+            <div class="btn-row" style="margin-top:8px">
+              <a href="ai-solutions/" class="world__more" data-cursor="Ask AI"><span data-i18n="more">Learn more</span> →</a>
             </div>
           </div>
-          <div class="feature__media reveal" data-delay="2">
-            <div class="panel">
-              <div class="q-num">Sales Training</div>
-              <h4 class="h3" style="margin-bottom:18px" data-i18n="sales.trainTitle">From interest to closing — skill by skill.</h4>
-              <div class="grid-cards" style="grid-template-columns:1fr 1fr">
-                <div class="card"><h4>Trust & Discovery</h4><p data-i18n="sales.t1">Open conversations, ask the right questions, uncover real needs.</p></div>
-                <div class="card"><h4>Value & Price</h4><p data-i18n="sales.t2">Present value, manage price, create urgency.</p></div>
-                <div class="card"><h4>Objections</h4><p data-i18n="sales.t3">Handle resistance with structure and confidence.</p></div>
-                <div class="card"><h4>Follow-up & Upsell</h4><p data-i18n="sales.t4">Close, retain and grow every customer.</p></div>
-              </div>
-            </div>
+          <div class="world__media reveal" data-delay="1">
+            <img src="assets/media/data-x.png" alt="DriftX AI" loading="lazy">
+            <span class="sticker sticker--acid sticker-float" style="top:2%;right:6%" aria-hidden="true">HUMANS + MACHINES</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ===================== SALES CENTERS ===================== -->
-    <section class="section">
+    <!-- ===================== THIS IS DRIFTX (video) ===================== -->
+    <section class="film" id="thisisdriftx">
       <div class="container">
-        <div class="eyebrow reveal">Sales Centers</div>
-        <h3 class="h2 reveal" data-delay="1" data-i18n="centers.title">Building Sales Teams From the Ground Up.</h3>
-        <p class="lead reveal" data-delay="2" style="margin:18px 0 10px" data-i18n="centers.lead">You don't just get people — you get sales infrastructure.</p>
-        <div class="grid-cards">
-          <div class="card reveal"><div class="card__icon">▤</div><h4>Structure & Roles</h4><p data-i18n="centers.c1">Center structure, roles, lead distribution & pipeline.</p></div>
-          <div class="card reveal" data-delay="1"><div class="card__icon">◎</div><h4>CRM & Scripts</h4><p data-i18n="centers.c2">CRM setup, scripts, KPIs, targets & quality control.</p></div>
-          <div class="card reveal" data-delay="2"><div class="card__icon">◔</div><h4>Reporting</h4><p data-i18n="centers.c3">Management dashboard, reporting & training.</p></div>
-          <div class="card reveal" data-delay="3"><div class="card__icon">✦</div><h4>AI Performance</h4><p data-i18n="centers.c4">AI-driven analysis of team performance.</p></div>
+        <div class="eyebrow reveal" style="justify-content:center">This is DriftX</div>
+        <div class="film__stage" id="filmStage">
+          <div class="film__media" id="filmMedia">
+            <video id="driftxVideo" muted loop playsinline preload="none">
+              <source src="assets/media/driftx.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="film__overlay" id="filmOverlay">THIS IS<br>DRIFTX</div>
         </div>
+        <div class="filmwords" id="filmWords" aria-hidden="true">
+          <span>THINK</span><span>BUILD</span><span>SELL</span><span>CREATE</span><span>TEST</span><span>LEARN</span><span>CHANGE</span><span>SCALE</span>
+        </div>
+        <p class="lead muted reveal" style="text-align:center;margin:22px auto 0">People. Ideas. Technology. Movement.</p>
       </div>
     </section>
 
-    <!-- ===================== MARKETING ===================== -->
-    <section class="section">
-      <div class="container">
-        <div class="feature feature--rev">
-          <div class="feature__body">
-            <div class="eyebrow reveal">Marketing</div>
-            <h3 class="h2 feature__title reveal" data-delay="1">
-              <span data-i18n="mkt.title1">Better Leads.</span><br>
-              <span class="gradient-text" data-i18n="mkt.title2">Better Sales.</span>
-            </h3>
-            <p class="feature__text lead reveal" data-delay="2" data-i18n="mkt.text">
-              Our goal isn't the largest number of leads — it's the right leads. Before any campaign we learn who the customer is, what they're looking for, what competitors offer, and what actually makes them buy.
-            </p>
-            <p class="reveal muted" data-delay="3" style="font-weight:700;font-size:18px">
-              <span data-i18n="mkt.formula1">Marketing → Sales → Revenue.</span><br>
-              <span style="color:var(--ink-4)" data-i18n="mkt.formula2">Not just Marketing → Leads.</span>
-            </p>
-            <div class="btn-row reveal" data-delay="4" style="margin-top:24px">
-              <a href="marketing/" class="btn btn--ghost" data-cursor="Explore">Explore Marketing</a>
-            </div>
-          </div>
-          <div class="feature__media reveal" data-delay="1">
-            <div class="panel">
-              <div class="q-num">Market Intelligence</div>
-              <ul class="chk">
-                <li>Market & competitor analysis</li>
-                <li>Customer & offer analysis</li>
-                <li>Search behaviour & audience identification</li>
-                <li>Creative strategy & channel selection</li>
-                <li>Lead quality & conversion analysis</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== LEAD JOURNEY (leak) ===================== -->
-    <section class="section" id="leadjourney">
-      <div class="container">
-        <div class="eyebrow reveal">Visual Lead Journey</div>
-        <h3 class="h2 reveal" data-delay="1" data-i18n="journey.title">Where Are You Losing Customers?</h3>
-        <div class="journey" style="margin-top:36px">
-          <div class="funnel reveal" data-delay="1" id="funnel">
-            <div class="funnel__step" data-val="1000"><span class="bar" style="width:100%"></span><span class="label" data-i18n="journey.s1">Visitors</span><span class="val">1,000</span></div>
-            <div class="funnel__step" data-val="120"><span class="bar" style="width:70%"></span><span class="label" data-i18n="journey.s2">Leads</span><span class="val">120</span></div>
-            <div class="funnel__step leak" data-val="80"><span class="bar" style="width:52%"></span><span class="label" data-i18n="journey.s3">Contacted <span class="leak-tag">Leak</span></span><span class="val">80</span></div>
-            <div class="funnel__step" data-val="25"><span class="bar" style="width:34%"></span><span class="label" data-i18n="journey.s4">Qualified</span><span class="val">25</span></div>
-            <div class="funnel__step leak" data-val="8"><span class="bar" style="width:16%"></span><span class="label" data-i18n="journey.s5">Sales <span class="leak-tag">Leak</span></span><span class="val">8</span></div>
-          </div>
-          <div class="journey__note reveal" data-delay="2">
-            <div class="big gradient-text" data-i18n="journey.noteBig">DRIFTX Analysis</div>
-            <p class="muted" data-i18n="journey.noteText">Every drop is money leaving the business. We find the leaks — slow response, no follow-up, poor lead quality — and we close them.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== BUSINESS CONSULTING ===================== -->
-    <section class="section">
-      <div class="container">
-        <div class="eyebrow reveal">Business Consulting</div>
-        <h3 class="h2 reveal" data-delay="1">
-          <span data-i18n="biz.title1">Sometimes the Problem</span><br>
-          <span class="cool-text" data-i18n="biz.title2">Isn't Marketing.</span>
-        </h3>
-        <p class="lead reveal" data-delay="2" style="margin:20px 0 10px" data-i18n="biz.lead">
-          You can't fix everything with advertising. Sometimes the issue is pricing, people, management, the product, the process, service, or how the business makes decisions.
-        </p>
-        <div class="btn-row reveal" data-delay="3" style="margin-top:24px">
-          <a href="business-consulting/" class="btn btn--ghost" data-cursor="Explore">Explore Business Consulting</a>
-        </div>
-
-        <div class="eyebrow reveal" style="margin-top:60px">How We Consult</div>
-        <div class="process" style="margin-top:24px">
-          <div class="step reveal"><div class="num">01</div><h4>Discover</h4><p data-i18n="proc.1">Learn the business inside out.</p></div>
-          <div class="step reveal"><div class="num">02</div><h4>Analyze</h4><p data-i18n="proc.2">Examine data, processes & people.</p></div>
-          <div class="step reveal"><div class="num">03</div><h4>Identify</h4><p data-i18n="proc.3">Pinpoint blockers & bottlenecks.</p></div>
-          <div class="step reveal"><div class="num">04</div><h4>Design</h4><p data-i18n="proc.4">Build a tailored action plan.</p></div>
-          <div class="step reveal"><div class="num">05</div><h4>Implement</h4><p data-i18n="proc.5">Deploy processes & systems.</p></div>
-          <div class="step reveal"><div class="num">06</div><h4>Train</h4><p data-i18n="proc.6">Coach the team & managers.</p></div>
-          <div class="step reveal"><div class="num">07</div><h4>Measure</h4><p data-i18n="proc.7">Track real results.</p></div>
-          <div class="step reveal"><div class="num">08</div><h4>Optimize</h4><p data-i18n="proc.8">Keep improving.</p></div>
-        </div>
-
-        <h3 class="h1 gradient-text banner-quote reveal" style="margin-top:80px" data-i18n="biz.pdf">We Don't Leave You With a PDF.</h3>
-        <p class="lead reveal" data-delay="1" style="text-align:center;margin:16px auto 0;max-width:60ch" data-i18n="biz.pdfText">
-          Consulting doesn't end with a report. We stay through Strategy → Implementation → Training → Measurement.
-        </p>
-      </div>
-    </section>
-
-    <!-- ===================== WEB ===================== -->
-    <section class="section" id="work">
-      <div class="container">
-        <div class="feature">
-          <div class="feature__body">
-            <div class="eyebrow reveal">Web & Digital Experiences</div>
-            <h3 class="h2 feature__title reveal" data-delay="1">
-              <span data-i18n="web.title1">Websites Should Do More</span><br>
-              <span class="gradient-text" data-i18n="web.title2">Than Look Good.</span>
-            </h3>
-            <p class="feature__text lead reveal" data-delay="2" data-i18n="web.text">
-              We build high-end digital experiences where design, UX/UI, technology, marketing, sales, data and AI meet. Not just a beautiful website — a digital experience that works.
-            </p>
-            <div class="btn-row reveal" data-delay="3">
-              <a href="web-development/" class="btn btn--ghost" data-cursor="View" data-i18n="web.cta">See What We Build</a>
-            </div>
-          </div>
-          <div class="feature__media reveal" data-delay="1">
-            <div class="panel">
-              <div class="grid-cards" style="grid-template-columns:1fr 1fr">
-                <div class="card card--glow-blue"><div class="card__icon">◱</div><h4>Design + UX</h4><p>Desktop, tablet & mobile crafted together.</p></div>
-                <div class="card card--glow-violet"><div class="card__icon">◈</div><h4>Technology</h4><p>Fast, modern, built to convert.</p></div>
-                <div class="card card--glow-turq"><div class="card__icon">◇</div><h4>Data</h4><p>Measured, tracked, optimized.</p></div>
-                <div class="card"><div class="card__icon">✦</div><h4>AI</h4><p>Intelligence built into the experience.</p></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== AI ===================== -->
-    <section class="section" id="ai">
-      <div class="container">
-        <div class="eyebrow reveal" style="color:var(--turq)">Your Business + AI</div>
-        <h2 class="h1 reveal" data-delay="1">
-          <span data-i18n="ai.title1">AI Isn't The Future.</span><br>
-          <span class="cool-text" data-i18n="ai.title2">It's Already Changing Business.</span>
-        </h2>
-        <p class="lead reveal" data-delay="2" style="margin:22px 0 40px" data-i18n="ai.lead">
-          AI isn't just a tool for writing text. It can become part of your business infrastructure — analyzing, qualifying, supporting and deciding faster.
-        </p>
-        <div class="grid-cards">
-          <div class="card card--glow-turq reveal"><div class="card__icon">✦</div><h4>AI Sales Analysis</h4><p data-i18n="ai.s1">Understand what your sales team is really doing.</p></div>
-          <div class="card card--glow-turq reveal" data-delay="1"><div class="card__icon">✦</div><h4>AI Lead Qualification</h4><p data-i18n="ai.s2">Score and route leads automatically.</p></div>
-          <div class="card card--glow-turq reveal" data-delay="2"><div class="card__icon">✦</div><h4>AI Customer Support</h4><p data-i18n="ai.s3">Always-on, consistent, human-like support.</p></div>
-          <div class="card card--glow-turq reveal" data-delay="3"><div class="card__icon">✦</div><h4>AI Call Analysis</h4><p data-i18n="ai.s4">Every call analyzed for quality & intent.</p></div>
-          <div class="card card--glow-turq reveal"><div class="card__icon">✦</div><h4>AI Reporting</h4><p data-i18n="ai.s5">Reports that write and explain themselves.</p></div>
-          <div class="card card--glow-turq reveal" data-delay="1"><div class="card__icon">✦</div><h4>AI Business Intelligence</h4><p data-i18n="ai.s6">Turn scattered data into decisions.</p></div>
-        </div>
-        <div class="btn-row reveal" style="margin-top:30px">
-          <a href="ai-solutions/" class="btn btn--ghost" data-cursor="Enter AI">Explore AI Solutions</a>
-          <a href="business-automation/" class="btn btn--ghost" data-cursor="Enter AI">Business Automation</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== MANUAL → INTELLIGENT ===================== -->
-    <section class="section">
-      <div class="container">
-        <div class="eyebrow reveal">From Manual to Intelligent</div>
-        <div class="split" style="margin-top:30px">
-          <div class="split__col old reveal">
-            <h4>Old Business</h4>
-            <ul class="flowlist">
-              <li>Employee</li><li>Excel</li><li>Email &amp; WhatsApp</li><li>Copy · Paste</li><li>Report · Repeat</li>
-            </ul>
-          </div>
-          <div class="split__arrow reveal" data-delay="1" aria-hidden="true">→</div>
-          <div class="split__col new reveal" data-delay="2">
-            <h4>DriftX AI Business</h4>
-            <ul class="flowlist">
-              <li>Data</li><li>AI</li><li>Automation</li><li>Action</li><li>Result</li>
-            </ul>
-          </div>
-        </div>
-        <p class="lead reveal" style="text-align:center;margin:34px auto 0;max-width:52ch" data-i18n="manual.text">
-          Less repetitive work. Better information. Faster decisions.
-        </p>
-      </div>
-    </section>
-
-    <!-- ===================== AUTOMATION + SYSTEMS ===================== -->
-    <section class="section">
-      <div class="container">
-        <div class="eyebrow reveal">Automation</div>
-        <h3 class="h2 reveal" data-delay="1">
-          <span data-i18n="auto.title1">If a Machine Can Do It Better,</span><br>
-          <span class="gradient-text" data-i18n="auto.title2">Why Is Your Team Still Doing It Manually?</span>
-        </h3>
-        <p class="lead reveal" data-delay="2" style="margin:18px 0 30px" data-i18n="auto.text">
-          A lead comes in → auto-added to CRM → classified → assigned → notified → follow-up created → status checked → AI analyzes the result.
-        </p>
-
-        <div class="eyebrow reveal" style="margin-top:60px">Systems &amp; Technology</div>
-        <h3 class="h2 reveal" data-delay="1" data-i18n="sys.title">Technology Built Around Your Workflow.</h3>
-        <div class="grid-cards" style="margin-top:26px">
-          <div class="card card--glow-blue reveal"><h4>CRM Systems</h4><p data-i18n="sys.c1">Custom CRM & lead management.</p></div>
-          <div class="card card--glow-blue reveal" data-delay="1"><h4>Dashboards & Portals</h4><p data-i18n="sys.c2">Custom dashboards & customer portals.</p></div>
-          <div class="card card--glow-violet reveal" data-delay="2"><h4>Applications</h4><p data-i18n="sys.c3">Mobile, store & internal applications.</p></div>
-          <div class="card card--glow-violet reveal" data-delay="3"><h4>Integrations</h4><p data-i18n="sys.c4">APIs & existing software integrations.</p></div>
-          <div class="card card--glow-turq reveal"><h4>Automation</h4><p data-i18n="sys.c5">Workflow automation across the business.</p></div>
-          <div class="card card--glow-turq reveal" data-delay="1"><h4>AI Integrations</h4><p data-i18n="sys.c6">AI woven into your systems.</p></div>
-        </div>
-        <div class="btn-row reveal" style="margin-top:30px">
-          <a href="crm-development/" class="btn btn--ghost" data-cursor="View">CRM Development</a>
-          <a href="custom-software/" class="btn btn--ghost" data-cursor="View">Custom Software</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== ONE CONNECTED SYSTEM ===================== -->
+    <!-- ===================== ONE CONNECTED SYSTEM (orbit) ===================== -->
     <section class="section">
       <div class="container">
         <div class="eyebrow reveal" style="justify-content:center;width:100%">The DriftX Difference</div>
@@ -420,17 +257,27 @@
       </div>
     </section>
 
-    <!-- ===================== WHY DRIFTX ===================== -->
-    <section class="section">
-      <div class="container container--narrow">
-        <div class="eyebrow reveal">Why DriftX</div>
-        <h2 class="h1 reveal" data-delay="1" data-i18n="why.title">We Look Beyond The Obvious.</h2>
-        <div class="problems" style="margin-top:30px">
-          <div class="problem-row reveal"><span class="n">—</span><span data-i18n="why.p1">A business asking for more leads doesn't always need more advertising.</span></div>
-          <div class="problem-row reveal"><span class="n">—</span><span data-i18n="why.p2">A business asking for a new CRM doesn't always need a new system.</span></div>
-          <div class="problem-row reveal"><span class="n">—</span><span data-i18n="why.p3">A business asking for more salespeople doesn't always need more staff.</span></div>
+    <!-- ===================== TREND CULTURE ===================== -->
+    <section class="section" id="trend">
+      <div class="container">
+        <div class="eyebrow reveal" data-i18n="trend.eyebrow">Trend Intelligence</div>
+        <h2 class="mega reveal" data-delay="1"><span class="grad-accent" style="--accent:var(--pink);--accent-2:var(--yellow)" data-i18n="trend.title">We Watch What's Next.</span></h2>
+        <p class="lead reveal" data-delay="2" style="margin-top:22px;max-width:60ch" data-i18n="trend.text">
+          Markets change. People change. Platforms change. So businesses have to change too — and we translate that into your advantage.
+        </p>
+        <div class="trendlist reveal" data-delay="2" aria-hidden="true">
+          <span>AI</span><span>Consumer behaviour</span><span>Social platforms</span><span>Digital design</span><span>Commerce</span><span>Automation</span><span>Brand culture</span><span>Creative trends</span>
         </div>
-        <p class="h3 reveal" style="margin-top:30px" data-i18n="why.q">First we ask: <span class="gradient-text">what is actually broken?</span></p>
+        <div class="trendwall reveal" data-delay="1">
+          <figure class="t-wide t-tall"><img src="assets/media/statue.png" alt="Culture meets technology" loading="lazy"></figure>
+          <figure><img src="assets/media/person-gradient.png" alt="" loading="lazy"></figure>
+          <figure class="t-tall"><img src="assets/media/callcenter.png" alt="" loading="lazy"></figure>
+          <figure class="t-word">DRIFTX</figure>
+          <figure><img src="assets/media/char-woman.png" alt="" loading="lazy"></figure>
+          <figure class="t-wide"><img src="assets/media/data-x.png" alt="" loading="lazy" style="object-fit:contain;background:transparent"></figure>
+          <figure><img src="assets/media/Ellipse-7.png" alt="" loading="lazy"></figure>
+          <figure><img src="assets/media/Ellipse-6-2.png" alt="" loading="lazy"></figure>
+        </div>
       </div>
     </section>
 
@@ -440,7 +287,6 @@
         <div class="eyebrow reveal">Interactive · AI Business Scan</div>
         <h2 class="h1 reveal" data-delay="1" data-i18n="scan.title">What's Holding Your Business Back?</h2>
         <p class="lead reveal" data-delay="2" style="margin:18px 0 32px" data-i18n="scan.lead">Answer a few questions. Get an instant snapshot of where your business is strong — and where it's leaking potential.</p>
-
         <div class="scan reveal" data-delay="1" id="scanTool">
           <div class="scan__head">
             <div class="q-num"><span id="scanStep">Question 1</span> / <span id="scanTotal">8</span></div>
@@ -455,7 +301,6 @@
               <button class="btn btn--ghost" id="scanBack" data-i18n="scan.back" style="visibility:hidden">Back</button>
               <span class="muted" id="scanHint" data-i18n="scan.hint">Select an option to continue</span>
             </div>
-            <!-- Result -->
             <div class="scan-result" id="scanResult">
               <h3 class="h2" data-i18n="scan.yourScore">Your Business Score</h3>
               <div class="scores" id="scanScores"></div>
@@ -499,10 +344,10 @@
         <div class="eyebrow reveal">About DriftX</div>
         <h2 class="h1 reveal" data-delay="1" data-i18n="about.title">Built From Real Business Experience.</h2>
         <p class="lead reveal" data-delay="2" style="margin-top:22px" data-i18n="about.text">
-          DRIFTX was built around one simple idea: businesses don't need more disconnected suppliers — they need solutions that work together. Our experience across sales, marketing, technology and operations lets us look at a company differently. We combine human experience with technology and AI to find problems, improve performance and design systems around the way each business actually works.
+          DRIFTX was built around one simple idea: businesses don't need more disconnected suppliers — they need solutions that work together. We combine human experience with technology and AI to find problems, improve performance and design systems around the way each business actually works.
         </p>
       </div>
-      <div class="container" style="margin-top:50px">
+      <div class="container" style="margin-top:44px">
         <div class="philosophy">
           <div class="phil reveal"><div class="tag">Human</div><p data-i18n="phil.1">People are still at the heart of every business.</p></div>
           <div class="phil reveal" data-delay="1"><div class="tag">Data</div><p data-i18n="phil.2">Decisions should be based on information.</p></div>
@@ -518,8 +363,7 @@
       <div class="container">
         <div class="eyebrow reveal" data-i18n="insights.eyebrow">DriftX Insights</div>
         <h2 class="h1 reveal" data-delay="1" data-i18n="insights.title">Ideas Worth Acting On.</h2>
-        <p class="lead reveal" data-delay="2" style="margin:18px 0 34px" data-i18n="insights.lead">Practical thinking on sales, marketing, AI and the systems that connect them.</p>
-        <div class="grid-cards">
+        <div class="grid-cards" style="margin-top:30px">
           <a class="card reveal" href="#contact"><div class="q-num">Sales</div><h4 data-i18n="insights.i1">Why Your Leads Aren't Converting</h4><p class="muted" style="margin-top:14px"><span data-i18n="insights.read">Read</span> →</p></a>
           <a class="card reveal" data-delay="1" href="#contact"><div class="q-num">Technology</div><h4 data-i18n="insights.i2">When a Business Actually Needs a CRM</h4><p class="muted" style="margin-top:14px"><span data-i18n="insights.read">Read</span> →</p></a>
           <a class="card reveal" data-delay="2" href="#contact"><div class="q-num">Automation</div><h4 data-i18n="insights.i3">10 Tasks Your Business Should Automate</h4><p class="muted" style="margin-top:14px"><span data-i18n="insights.read">Read</span> →</p></a>
@@ -535,23 +379,25 @@
         <div class="contact">
           <div>
             <div class="eyebrow reveal">Contact</div>
-            <h2 class="h1 reveal" data-delay="1">
-              <span data-i18n="contact.title1">Let's Talk About</span><br>
-              <span class="gradient-text" data-i18n="contact.title2">Your Business.</span>
+            <h2 class="mega haveproblem reveal" data-delay="1">
+              HAVE A<br>
+              <span class="rotator" id="contactRotator">
+                <span class="w0 on">PROBLEM?</span>
+                <span class="w1">IDEA?</span>
+                <span class="w2">BUSINESS?</span>
+                <span class="w3">TEAM?</span>
+                <span class="w4">PRODUCT?</span>
+                <span class="w5">VISION?</span>
+              </span>
             </h2>
-            <p class="lead reveal" data-delay="2" style="margin-top:20px" data-i18n="contact.text">
-              Tell us where you are and what's slowing you down. We'll tell you what we'd look at first.
-            </p>
-            <p class="reveal" data-delay="3" style="margin-top:26px;font-weight:700;font-size:20px" data-i18n="contact.tagline">
-              Business, Evolved.
+            <p class="h3 reveal" data-delay="2" style="margin-top:16px">Let's move it forward.</p>
+            <p class="lead reveal" data-delay="3" style="margin-top:18px" data-i18n="contact2.text">
+              One problem, one idea, one goal — tell us. We'll tell you what we'd move first.
             </p>
           </div>
           <form class="form reveal" data-delay="1" id="contactForm" novalidate>
             <div class="field"><label data-i18n="contact.name">Name</label><input type="text" name="name" required></div>
-            <div class="field"><label data-i18n="contact.company">Company</label><input type="text" name="company"></div>
             <div class="field"><label data-i18n="contact.email">Email</label><input type="email" name="email" required></div>
-            <div class="field"><label data-i18n="contact.phone">Phone</label><input type="tel" name="phone"></div>
-            <div class="field"><label data-i18n="contact.does">What does your business do?</label><input type="text" name="does"></div>
             <div class="field"><label data-i18n="contact.challenge">What is your biggest challenge right now?</label><textarea name="challenge"></textarea></div>
             <div class="field">
               <label data-i18n="contact.focus">Where should we focus?</label>
@@ -572,14 +418,15 @@
     </section>
   </main>
 
-  <!-- ===================== FOOTER ===================== -->
-  <footer class="footer">
+  <!-- ===================== FOOTER (acid) ===================== -->
+  <footer class="footer footer--acid">
     <div class="container">
-      <div class="footer__brand" aria-hidden="true">DriftX</div>
+      <div class="footer__stand">DON'T<br>STAND STILL.</div>
       <div class="footer__grid">
         <div>
-          <p class="footer__tag" data-i18n="footer.tag">Sales × Marketing × Business × Technology × AI</p>
-          <p class="muted" style="margin-top:12px" data-i18n="footer.sub">Built for businesses that want to evolve.</p>
+          <p class="footer__tag">Sales × Marketing × Business × Technology × AI</p>
+          <p style="margin-top:12px" data-i18n="footer.sub">Built for businesses that want to evolve.</p>
+          <a href="#contact" class="btn btn--primary" data-cursor="Let's Talk" style="margin-top:18px" data-i18n="nav.talk">Let's Talk</a>
         </div>
         <div>
           <h5 data-i18n="footer.services">What We Do</h5>
@@ -591,7 +438,7 @@
         </div>
         <div>
           <h5 data-i18n="footer.company">Company</h5>
-          <a href="#work">Work</a><a href="#about">About</a><a href="#scan">Business Scan</a><a href="#contact">Contact</a>
+          <a href="#work">Work</a><a href="#about">About</a><a href="#scan">Business Scan</a><a href="#insights">Insights</a>
         </div>
         <div>
           <h5 data-i18n="footer.reach">Reach Us</h5>
@@ -607,7 +454,6 @@
   </footer>
 
   <script src="js/i18n.js"></script>
-  <script src="js/universe.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

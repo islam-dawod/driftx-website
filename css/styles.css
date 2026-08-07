@@ -23,6 +23,14 @@
   --turq: #22D3EE;         /* turquoise */
   --lime: #A3E635;         /* lime */
   --coral: #FF6B5B;        /* warm coral */
+  --yellow: #FFD400;       /* electric yellow (brand heritage) */
+  --acid: #C6FF3A;         /* acid green */
+  --pink: #FF2E7E;         /* hot pink */
+  --purple: #A855F7;       /* purple */
+
+  /* Per-section "world" accent — overridden by [data-world] */
+  --accent: var(--brand);
+  --accent-2: var(--coral);
 
   /* Text */
   --ink: #F4F7FC;
@@ -604,3 +612,130 @@ h1, h2, h3, h4 { line-height: 1.08; letter-spacing: -0.025em; font-weight: 800; 
   .footer__grid { grid-template-columns: 1fr; }
   .nav__right { gap: 12px; }
 }
+
+/* ==========================================================================
+   V2 — Bold / colorful / young "DriftX Universe" layer
+   ========================================================================== */
+
+/* Per-section world accents */
+[data-world="sales"]     { --accent: #FFD400; --accent-2: #FF9E00; }
+[data-world="marketing"] { --accent: #FF2E7E; --accent-2: #FF7AC0; }
+[data-world="business"]  { --accent: #FF7A1A; --accent-2: #FFB020; }
+[data-world="tech"]      { --accent: #2E7DFF; --accent-2: #22D3EE; }
+[data-world="ai"]        { --accent: #C6FF3A; --accent-2: #A855F7; }
+
+.accent { color: var(--accent); }
+.grad-accent {
+  background: linear-gradient(100deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+/* Logo as real image (original brand asset) */
+.logo__img { height: 30px; width: auto; display: block; }
+@media (max-width: 560px) { .logo__img { height: 26px; } }
+
+/* Giant typography */
+.giant { font-size: clamp(60px, 15vw, 220px); font-weight: 900; letter-spacing: -0.05em; line-height: 0.82; }
+.mega  { font-size: clamp(44px, 9vw, 130px); font-weight: 900; letter-spacing: -0.045em; line-height: 0.9; }
+
+/* Multi-colour living blobs (adds to base .mesh) */
+.mesh .blob-4, .mesh .blob-5 { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.4; }
+.mesh .blob-4 { width: 40vmax; height: 40vmax; right: 10vmax; bottom: 10vmax;
+  background: radial-gradient(circle, var(--pink), transparent 60%); animation: drift1 32s var(--ease) infinite alternate; }
+.mesh .blob-5 { width: 34vmax; height: 34vmax; left: 20vmax; top: 30vmax;
+  background: radial-gradient(circle, var(--acid), transparent 60%); animation: drift2 38s var(--ease) infinite alternate; }
+
+/* ---- HERO v2 ---- */
+.hero2 { position: relative; min-height: 100svh; display: flex; align-items: center; padding-top: var(--nav-h); overflow: hidden; }
+.hero2 .brandline { font-size: clamp(15px,1.8vw,20px); font-weight: 700; letter-spacing: .3em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; }
+.hero2 .evolved { font-size: clamp(20px,3vw,34px); font-weight: 800; color: var(--ink); margin-bottom: 30px; }
+.hero2 .evolved b { color: var(--brand); }
+.hero2 .build { line-height: .9; }
+
+/* Rotating word */
+.rotator { display: inline-grid; vertical-align: top; }
+.rotator > span { grid-area: 1/1; opacity: 0; transform: translateY(0.35em); transition: opacity .5s var(--ease), transform .5s var(--ease); }
+.rotator > span.on { opacity: 1; transform: none; }
+.rotator .w-sales { color: var(--yellow); }
+.rotator .w-marketing { color: var(--pink); }
+.rotator .w-business { color: #FF7A1A; }
+.rotator .w-tech { color: var(--blue); }
+.rotator .w-ai { color: var(--acid); }
+.rotator .w-next { background: linear-gradient(100deg,var(--brand),var(--pink)); -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent; }
+
+/* Hero X portal (original brand X-shaped image, zooms on scroll) */
+.hero2__x { position: absolute; z-index: 0; right: -6vw; top: 50%; width: min(58vw, 700px); transform: translateY(-50%); pointer-events: none; will-change: transform, opacity; }
+.hero2__x img { width: 100%; filter: drop-shadow(0 30px 80px rgba(0,0,0,.5)); }
+@media (max-width: 900px) { .hero2__x { right: -22vw; opacity: .3; width: 92vw; } }
+
+/* ---- Stickers ---- */
+.sticker { display: inline-block; font-weight: 800; font-size: 13px; letter-spacing: .02em;
+  padding: 9px 15px; border-radius: 14px; color: #0b0b0b; background: var(--yellow);
+  box-shadow: 0 8px 24px rgba(0,0,0,.3); transform: rotate(-4deg); line-height: 1.15; }
+.sticker--pink { background: var(--pink); color: #fff; transform: rotate(3deg); }
+.sticker--acid { background: var(--acid); transform: rotate(-2deg); }
+.sticker--blue { background: var(--blue); color: #fff; transform: rotate(2deg); }
+.sticker--outline { background: transparent; color: var(--ink); border: 1.5px dashed var(--stroke-strong); }
+.sticker-float { position: absolute; z-index: 3; }
+
+/* ---- Colourful marquee ---- */
+.marquee--color .marquee__track span { color: var(--ink); }
+.marquee--color .c1 { color: var(--yellow); } .marquee--color .c2 { color: var(--pink); }
+.marquee--color .c3 { color: var(--blue); } .marquee--color .c4 { color: var(--acid); }
+.marquee--color .c5 { color: var(--brand); } .marquee--color .c6 { color: var(--purple); }
+
+/* ---- Service world block ---- */
+.world { position: relative; padding: clamp(60px,9vh,120px) 0; border-top: 1px solid var(--stroke); overflow: hidden; }
+.world__glow { position: absolute; inset: 0; z-index: -1; opacity: .16;
+  background: radial-gradient(60vmax circle at var(--gx,80%) var(--gy,30%), var(--accent), transparent 60%); }
+.world__grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(30px,5vw,70px); align-items: center; }
+.world--rev .world__media { order: -1; }
+.world__label { font-size: clamp(46px,9vw,120px); font-weight: 900; letter-spacing: -.04em; line-height: .9; color: var(--accent); }
+.world__lines { font-size: clamp(22px,3.4vw,40px); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin: 14px 0 22px; }
+.world__lines .muted2 { color: var(--ink-3); }
+.world__more { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ink);
+  border-bottom: 2px solid var(--accent); padding-bottom: 4px; transition: gap .25s; }
+.world__more:hover { gap: 16px; }
+.world__media img { width: 100%; height: auto; }
+.world__media { position: relative; }
+@media (max-width: 900px) { .world__grid { grid-template-columns: 1fr; } .world--rev .world__media { order: 0; } }
+
+/* ---- Video: this is DriftX (circle grows) ---- */
+.film { position: relative; padding: clamp(60px,9vh,120px) 0; text-align: center; }
+.film__stage { position: relative; margin: 30px auto 0; width: 100%; max-width: 1100px; aspect-ratio: 16/9; display: grid; place-items: center; }
+.film__media { position: absolute; inset: 0; margin: auto; overflow: hidden; clip-path: circle(var(--r, 18%) at 50% 50%); border-radius: 10px; }
+.film__media video { width: 100%; height: 100%; object-fit: cover; }
+.film__overlay { position: absolute; z-index: 2; pointer-events: none; font-weight: 900; letter-spacing: -.03em; font-size: clamp(40px,8vw,110px); color: #fff; mix-blend-mode: difference; }
+.filmwords { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: center; margin-top: 26px; }
+.filmwords span { font-weight: 900; font-size: clamp(20px,3vw,40px); letter-spacing: -.03em; color: var(--ink-4); transition: color .3s; }
+.filmwords span.on { color: var(--ink); }
+
+/* ---- Trend culture ---- */
+.trendlist { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.trendlist span { padding: 9px 16px; border: 1px solid var(--stroke-strong); border-radius: 999px; font-weight: 600; color: var(--ink-2); }
+.trendwall { display: grid; grid-template-columns: repeat(6, 1fr); grid-auto-rows: 120px; gap: 14px; margin-top: 40px; }
+.trendwall figure { margin: 0; border-radius: 16px; overflow: hidden; border: 1px solid var(--stroke); background: var(--surface); }
+.trendwall img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.trendwall .t-tall { grid-row: span 2; }
+.trendwall .t-wide { grid-column: span 2; }
+.trendwall .t-word { display: grid; place-items: center; font-weight: 900; font-size: clamp(24px,3vw,52px); color: #0b0b0b; background: var(--acid); border: none; letter-spacing: -.04em; }
+@media (max-width: 760px) { .trendwall { grid-template-columns: repeat(3, 1fr); } }
+
+/* ---- Contact v2 ---- */
+.haveproblem { font-weight: 900; letter-spacing: -.03em; line-height: .95; }
+.haveproblem .rotator .w0 { color: var(--pink); } .haveproblem .rotator .w1 { color: var(--yellow); }
+.haveproblem .rotator .w2 { color: var(--blue); } .haveproblem .rotator .w3 { color: var(--acid); }
+.haveproblem .rotator .w4 { color: var(--brand); } .haveproblem .rotator .w5 { color: var(--purple); }
+
+/* ---- Acid footer ---- */
+.footer--acid { background: var(--yellow); color: #0b0b0b; border: none; }
+.footer--acid .footer__stand { font-size: clamp(44px,11vw,150px); font-weight: 900; letter-spacing: -.05em; line-height: .85; color: #0b0b0b; margin-bottom: 30px; }
+.footer--acid a, .footer--acid .footer__tag, .footer--acid .muted, .footer--acid h5, .footer--acid span { color: #0b0b0b; }
+.footer--acid .footer__grid a:hover { color: #444; }
+.footer--acid .footer__bottom { border-top-color: rgba(0,0,0,.2); }
+.footer--acid .footer__brand { background: linear-gradient(180deg, rgba(0,0,0,.16), rgba(0,0,0,.03)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.footer--acid .btn--primary { background: #0b0b0b; color: var(--yellow); box-shadow: none; }
+.footer--acid .btn--primary:hover { background: #222; }
+
+/* character floats */
+.char-float { position: absolute; z-index: 2; pointer-events: none; filter: drop-shadow(0 20px 40px rgba(0,0,0,.4)); }

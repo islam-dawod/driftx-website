@@ -297,6 +297,72 @@
   const restart = $("#scanRestart");
   if (restart) restart.addEventListener("click", buildScan);
 
+  /* ---------- Rotating words ---------- */
+  function makeRotator(el, interval) {
+    if (!el) return;
+    const items = Array.from(el.children);
+    if (!items.length) return;
+    items.forEach((x) => x.classList.remove("on"));
+    let i = 0; items[0].classList.add("on");
+    if (reduce || items.length < 2) return;
+    setInterval(() => {
+      items[i].classList.remove("on");
+      i = (i + 1) % items.length;
+      items[i].classList.add("on");
+    }, interval);
+  }
+  makeRotator($("#heroRotator"), 2100);
+  makeRotator($("#contactRotator"), 1700);
+  makeRotator($("#filmWords"), 700);
+
+  /* ---------- Hero X — zoom on scroll ---------- */
+  const heroX = $("#heroX"), heroEl = $("#hero");
+  if (heroX && heroEl && !reduce) {
+    let hticking = false;
+    const onHero = () => {
+      const h = heroEl.offsetHeight || 1;
+      const p = Math.min(1, Math.max(0, window.scrollY / h));
+      heroX.style.transform = "translateY(-50%) scale(" + (1 + p * 1.9).toFixed(3) + ")";
+      heroX.style.opacity = (1 - p * 0.92).toFixed(3);
+      hticking = false;
+    };
+    window.addEventListener("scroll", () => { if (!hticking) { hticking = true; requestAnimationFrame(onHero); } }, { passive: true });
+    onHero();
+  }
+
+  /* ---------- "This is DriftX" — growing video circle ---------- */
+  const stage = $("#filmStage"), media = $("#filmMedia"), overlay = $("#filmOverlay"), video = $("#driftxVideo");
+  if (stage && media) {
+    let loaded = false;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) {
+          if (video && !loaded) { loaded = true; try { video.load(); } catch (e) {} }
+          if (video) video.play().catch(() => {});
+        } else if (video) { video.pause(); }
+      });
+    }, { threshold: 0.3 });
+    io.observe(stage);
+
+    if (reduce) {
+      media.style.clipPath = "circle(72% at 50% 50%)";
+      if (overlay) overlay.style.opacity = "0";
+    } else {
+      let fticking = false;
+      const onFilm = () => {
+        const r = stage.getBoundingClientRect(), vh = window.innerHeight;
+        const center = r.top + r.height / 2;
+        const p = Math.min(1, Math.max(0, 1 - Math.abs(center - vh / 2) / (vh * 0.75)));
+        media.style.clipPath = "circle(" + (18 + p * 62).toFixed(1) + "% at 50% 50%)";
+        if (overlay) overlay.style.opacity = (1 - p * 1.15).toFixed(2);
+        fticking = false;
+      };
+      window.addEventListener("scroll", () => { if (!fticking) { fticking = true; requestAnimationFrame(onFilm); } }, { passive: true });
+      window.addEventListener("resize", onFilm);
+      onFilm();
+    }
+  }
+
   /* ---------- Init language (persisted or browser) ---------- */
   let initLang = "en";
   try {
