@@ -1,0 +1,5 @@
+# DriftX — redirect legacy /new/ URLs to the site root (301)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^new/?(.*)$ /$1 [R=301,L]
+</IfModule>

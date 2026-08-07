@@ -316,7 +316,7 @@ def build_page(svc):
   <meta name="description" content="%(desc)s">
   <meta name="theme-color" content="#070A14">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-  <link rel="canonical" href="https://driftx.co/new/%(slug)s/">
+  <link rel="canonical" href="https://driftx.co/%(slug)s/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">

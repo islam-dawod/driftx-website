@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://driftx.co/new/sitemap.xml
+Sitemap: https://driftx.co/sitemap.xml

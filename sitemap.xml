@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://driftx.co/new/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://driftx.co/new/sales-consulting/</loc><priority>0.8</priority></url>
-  <url><loc>https://driftx.co/new/sales-training/</loc><priority>0.8</priority></url>
-  <url><loc>https://driftx.co/new/sales-center/</loc><priority>0.8</priority></url>
-  <url><loc>https://driftx.co/new/marketing/</loc><priority>0.8</priority></url>
-  <url><loc>https://driftx.co/new/business-consulting/</loc><priority>0.8</priority></url>
-  <url><loc>https://driftx.co/new/web-development/</loc><priority>0.8</priority></url>
-  <url><loc>https://driftx.co/new/crm-development/</loc><priority>0.8</priority></url>
-  <url><loc>https://driftx.co/new/custom-software/</loc><priority>0.8</priority></url>
-  <url><loc>https://driftx.co/new/ai-solutions/</loc><priority>0.8</priority></url>
-  <url><loc>https://driftx.co/new/business-automation/</loc><priority>0.8</priority></url>
+  <url><loc>https://driftx.co/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://driftx.co/sales-consulting/</loc><priority>0.8</priority></url>
+  <url><loc>https://driftx.co/sales-training/</loc><priority>0.8</priority></url>
+  <url><loc>https://driftx.co/sales-center/</loc><priority>0.8</priority></url>
+  <url><loc>https://driftx.co/marketing/</loc><priority>0.8</priority></url>
+  <url><loc>https://driftx.co/business-consulting/</loc><priority>0.8</priority></url>
+  <url><loc>https://driftx.co/web-development/</loc><priority>0.8</priority></url>
+  <url><loc>https://driftx.co/crm-development/</loc><priority>0.8</priority></url>
+  <url><loc>https://driftx.co/custom-software/</loc><priority>0.8</priority></url>
+  <url><loc>https://driftx.co/ai-solutions/</loc><priority>0.8</priority></url>
+  <url><loc>https://driftx.co/business-automation/</loc><priority>0.8</priority></url>
 </urlset>
