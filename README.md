@@ -17,10 +17,49 @@ assets/brand/       Logo source assets
 favicon.svg  robots.txt  sitemap.xml
 
 x-ray/index.html        Business X-Ray™ — AI business diagnostic (js/xray.js, css/xray.css)
-ai-marketing/index.html Marketing Control Tower — product page + live cockpit demo
-css/control-tower.css   Control Tower page styles
-js/control-tower.js     Control Tower content (EN/HE/AR triples) + cockpit demo logic
+ai-marketing/index.html Marketing Control Tower — public product page + cockpit preview
+ai-marketing/app/       THE SYSTEM — sign-in, onboarding, dashboard, diagnosis, issues, tasks
+css/control-tower.css   Public page styles
+css/mkt-app.css         System UI (app chrome, dense data, dark + light)
+js/control-tower.js     Public page content (EN/HE/AR) + cockpit preview
+js/mkt-i18n.js          System strings + catalogues (departments, connectors, trainings, assessment)
+js/mkt-data.js          State (localStorage), dataset generator, analytics, scoring
+js/mkt-engine.js        Rules engine, verification loop, tasks, diagnosis
+js/mkt-views.js         Screens
+js/mkt-app.js           Shell, router, sign-in, onboarding, wiring
 ```
+
+## AI Marketing — public page vs system
+`/ai-marketing/` sells the product. **`/ai-marketing/app/` is the product**: a working
+front-end system, not a landing page.
+
+- **Sign-in** — email only. The password field is never read, stored or sent; Google SSO,
+  password reset and 2FA are shown as disabled because they need a server.
+- **Onboarding (5 steps)** — business profile, departments + owners, 12 data connections,
+  11 targets, 18-question assessment. Saved to `localStorage` under `driftx_mkt_v1`.
+- **14 screens** — dashboard, AI diagnosis, funnel, campaigns (+ drill-down), leads,
+  sales & team (+ per-rep drill-down), site & tracking, content & reputation, issues,
+  action plan, knowledge, implementation %, reports, settings.
+- **Everything is computed.** A seeded generator builds campaign/lead/rep records scaled to
+  the business profile you entered (declared monthly volume, budget and deal size), then the
+  funnel, KPIs, scores, per-rep scorecards and issues are derived from those records. No
+  headline number is hardcoded.
+- **Rules engine** — 13 detectors (capture gap, SLA breach, no follow-up, CPL, quality drop,
+  creative fatigue, budget allocation, UTM, unassigned, lost reason, duplicates, reviews SLA,
+  site health), each scored `Impact × Urgency × Scope × Confidence`.
+- **Closure requires verification.** Pressing "closed" is blocked until the metric is back
+  inside range; the loop is issue → task → done → re-measure → close.
+- **Honesty rules.** With no source connected every analytics screen shows the empty state
+  ("connect your advertising platform or your CRM") — never demo numbers dressed as the
+  business's own. Demo mode is opt-in and badged on every screen. Fact / estimate /
+  recommendation are visually separated, and the final score is withheld when data
+  reliability drops below 60.
+- Full EN/HE/AR with RTL, dark + light theme, mobile drawer.
+
+### What needs a backend
+Real accounts and sessions, a shared database, live OAuth tokens for Google/Meta/CRM,
+scheduled syncs, server-side reports and email delivery. The client is structured so
+`js/mkt-data.js` is the only place that has to change.
 
 ## Marketing Control Tower — `/ai-marketing/`
 The AI marketing performance control system (`DRIFTX_AI_Marketing_Control_System_Spec_HE.docx`)

@@ -1173,7 +1173,16 @@
       '<span class="ttl">' + P(T.cockTitle) + '</span>' +
       '<span class="live"><i></i>' + P(T.cockLive) + '</span></div>' +
       tabs + '<div class="ct-cock__body" id="ctBody"></div></div>' +
-      '<p class="ct-note" style="margin-top:14px">' + P(T.demoNote) + '</p>';
+      '<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:16px">' +
+      '<a class="btn btn--primary" href="app/" data-cursor="System">' + P({
+        en: "Open the real system", he: "לפתיחת המערכת האמיתית", ar: "افتح النظام الحقيقي"
+      }) + '</a>' +
+      '<p class="ct-note" style="flex:1;min-width:260px;margin:0">' + P({
+        en: "This section is a preview on four fixed scenarios. The system itself runs your own onboarding, connections, diagnosis, issues, tasks and reports.",
+        he: "החלק הזה הוא תצוגה מקדימה על ארבעה תרחישים קבועים. המערכת עצמה מריצה את ההקמה, החיבורים, האבחון, הבעיות, המשימות והדוחות שלך.",
+        ar: "هذا القسم عرض مسبق على أربعة سيناريوهات ثابتة. أما النظام نفسه فيشغّل إعدادك واتصالاتك وتشخيصك ومشكلاتك ومهامك وتقاريرك."
+      }) + '</p></div>' +
+      '<p class="ct-note" style="margin-top:10px">' + P(T.demoNote) + '</p>';
     return H("cockpit", "03", P(T.secCockpit),
       P({ en: "The same week, seen from the control tower.", he: "אותו שבוע, במבט מחדר הבקרה.", ar: "الأسبوع نفسه، بعين غرفة القيادة." }),
       P({ en: "Four situations every business recognises. Pick one and follow it end to end: the score, the reliability of the data behind it, where the funnel leaks, and the AI analysis with its evidence, its ranked root causes and the owner who has to act.",
