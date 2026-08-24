@@ -15,7 +15,24 @@ js/universe.js      Interactive hero constellation (canvas)
 js/app.js           Nav, cursor, scroll reveal, lead-journey, AI Business Scan, form
 assets/brand/       Logo source assets
 favicon.svg  robots.txt  sitemap.xml
+
+x-ray/index.html        Business X-Ray™ — AI business diagnostic (js/xray.js, css/xray.css)
+ai-marketing/index.html Marketing Control Tower — product page + live cockpit demo
+css/control-tower.css   Control Tower page styles
+js/control-tower.js     Control Tower content (EN/HE/AR triples) + cockpit demo logic
 ```
+
+## Marketing Control Tower — `/ai-marketing/`
+The AI marketing performance control system (`DRIFTX_AI_Marketing_Control_System_Spec_HE.docx`)
+turned into a product page. All copy lives in `js/control-tower.js` as `{en,he,ar}` triples and
+re-renders on language switch, so each language is a native experience rather than a translation.
+
+The **Executive Cockpit** section is an interactive demo with four real-world scenarios
+(lead-quality collapse, CRM capture gap, creative fatigue / budget misallocation, and a sales drop
+caused downstream of marketing). Each shows the scores, the funnel leaks, and an AI analysis that
+separates fact from estimate from recommendation — including the Data Trust gate that refuses to
+present a final score when reliability is below 60, and `Severity = Impact × Urgency × Scope ×
+Confidence`. Numbers are demo data, labelled as such.
 
 ## Highlights
 - Interactive **DRIFTX Universe** hero — the business core connected to Sales, Marketing, CRM, Web, AI, Automation, People, Data.
