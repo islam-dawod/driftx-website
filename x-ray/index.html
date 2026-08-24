@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Business X-Ray™ — DriftX AI Business Diagnostic</title>
+  <meta name="description" content="Free AI business diagnostic by DriftX. Answer a few questions and discover what's holding your business back — with a score, root-cause analysis and a 30-day action plan.">
+  <meta name="theme-color" content="#070A14">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Heebo:wght@400;500;600;700;800;900&family=Alexandria:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/xray.css">
+</head>
+<body>
+  <div class="mesh" aria-hidden="true"><div class="blob-3"></div><div class="blob-4"></div><div class="blob-5"></div><div class="grain"></div></div>
+  <div class="cursor-dot" aria-hidden="true"></div>
+  <div class="cursor-ring" aria-hidden="true"><span class="cursor-label"></span></div>
+
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="../" class="logo" aria-label="DriftX home">
+        <img class="logo__img" src="../assets/brand/logo-mark.png" alt="DriftX" width="171" height="49">
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="../#what" data-i18n="nav.what">What We Do</a>
+        <a href="../#worlds" data-i18n="nav.solutions">Solutions</a>
+        <a href="../#ai" data-i18n="nav.ai">AI</a>
+        <a href="../#work" data-i18n="nav.work">Work</a>
+        <a href="../#about" data-i18n="nav.about">About</a>
+        <a href="../#contact" data-i18n="nav.contact">Contact</a>
+      </nav>
+      <div class="nav__right">
+        <div class="lang" role="group" aria-label="Language">
+          <button data-lang="en" class="active">EN</button>
+          <button data-lang="he">עב</button>
+          <button data-lang="ar">ع</button>
+        </div>
+        <a href="../#contact" class="btn-talk" data-magnetic data-i18n="nav.talk">Let's Talk</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
+          <span data-i18n="nav.menu">Menu</span><span class="bars"><span></span><span></span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <div class="fsnav" id="fsnav" aria-hidden="true">
+    <button class="fsnav__close" id="fsnavClose" aria-label="Close menu">&times;</button>
+    <nav class="fsnav__list" aria-label="Full screen">
+      <a href="../#what" style="--i:0"><span data-i18n="nav.what">What We Do</span></a>
+      <a href="../#worlds" style="--i:1"><span data-i18n="nav.solutions">Solutions</span></a>
+      <a href="../#ai" style="--i:2">AI <span class="fsnav__x">×</span> Automation</a>
+      <a href="../#work" style="--i:3"><span data-i18n="nav.work">Work</span></a>
+      <a href="../#about" style="--i:4"><span data-i18n="nav.about">About</span></a>
+      <a href="../#contact" style="--i:5"><span data-i18n="nav.contact">Contact</span></a>
+    </nav>
+    <div class="fsnav__meta">Sales <span class="x-mark">×</span> Marketing <span class="x-mark">×</span> Business <span class="x-mark">×</span> Technology <span class="x-mark">×</span> AI</div>
+  </div>
+
+  <main class="xray">
+    <div class="container xray__stage">
+      <div id="xrayApp"><!-- diagnostic renders here --></div>
+    </div>
+  </main>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/xray.js"></script>
+</body>
+</html>
