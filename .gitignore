@@ -10,3 +10,9 @@ desktop.ini
 
 # Claude Code local config
 .claude/
+
+# server-side secrets — never commit
+api/config.php
+
+# Never commit real backend secrets to this (public) repo
+api/config.php
