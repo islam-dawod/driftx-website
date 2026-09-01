@@ -78,6 +78,15 @@ window.MKT_VIEWS = (function () {
       '<button class="mk-btn" data-act="demo-on">' + window.T("empty.demo") + '</button></div>' +
       '<p class="mk-hint" style="max-width:46ch">' + window.T("empty.demoNote") + '</p></div>';
   }
+  /* shown wherever the connected sources genuinely cannot answer the screen */
+  function needsSource() {
+    return '<div class="mk-empty"><div class="ico">◔</div><h3>' + window.T("src.needTitle") + '</h3>' +
+      '<p>' + window.T("src.needBody") + '</p>' +
+      '<div class="mk-note" style="max-width:62ch;text-align:start"><b>' + window.T("src.needCta") + ':</b> ' +
+      window.T("src.adsCovers") + '</div>' +
+      '<div class="acts"><a class="mk-btn mk-btn--pri" href="#/campaigns">' + window.T("nav.campaigns") + '</a>' +
+      '<a class="mk-btn" href="#/settings">' + window.T("nav.settings") + '</a></div></div>';
+  }
   function chart(series, labels) {
     var max = Math.max.apply(null, series.concat([1]));
     return '<div class="mk-chart">' + series.map(function (v, i) {
@@ -99,6 +108,7 @@ window.MKT_VIEWS = (function () {
   /* ---------------- dashboard ---------------- */
   function dashboard() {
     if (D.mode() === "empty") return { html: empty() };
+    if (!D.caps().leads) return dashboardAds();
     var s = D.state();
     var m = D.metrics(), sc = D.scores(), T = D.targets();
     var iss = E.openIssues();
@@ -185,6 +195,74 @@ window.MKT_VIEWS = (function () {
     };
   }
 
+  /* ---------------- dashboard: ads-only (live platforms, no CRM) ---------- */
+  function dashboardAds() {
+    var s = D.state(), m = D.metrics(), sc = D.scores(), T = D.targets();
+    var iss = E.openIssues();
+    var rem = D.remote();
+    var name = (s.user && s.user.name) || (s.biz && s.biz.name) || "—";
+    var lastSync = "—";
+    if (rem && rem.connections) {
+      Object.keys(rem.connections).forEach(function (k) {
+        var c = rem.connections[k];
+        if (c && c.lastSync) lastSync = fmtDT(Date.parse(c.lastSync.replace(" ", "T") + "Z"));
+      });
+    }
+    var head = '<div class="mk-h1">' + esc(window.T("dash.hi", { name: name })) + '</div>' +
+      '<div class="mk-sub">' + pill(window.T("live.badge"), "low") + ' ' +
+      esc(window.T("dash.updated", { t: lastSync })) + '</div>';
+
+    var note = '<div class="mk-banner" style="margin-top:14px"><span>◔</span><p>' + window.T("src.noOverall") + '</p>' +
+      '<a class="mk-btn mk-btn--sm" href="#/settings">' + window.T("nav.settings") + '</a></div>';
+    var mixed = (rem && rem.mixedCurrency)
+      ? '<div class="mk-banner"><span>⇄</span><p>' + esc(window.T("live.mixedCurrency", { c: (rem.currencies || []).join(", ") })) + '</p></div>'
+      : "";
+
+    var top = '<div class="mk-grid2 mk-sec">' +
+      '<div class="mk-card">' + ring(sc.marketing, sc.band, window.T("src.adsScore"),
+        'CPL ' + D.money(m.cpl) + ' · ' + window.T("l.target") + ' ' + D.money(T.cpl) + '<br>CTR ' + m.ctr + '%') + '</div>' +
+      '<div class="mk-card"><div class="mk-card__h"><h3>' + window.T("dash.trust") + '</h3></div>' +
+        '<div class="mk-kpi" style="border:0;padding:0"><div class="v">' + sc.trust + '/100</div>' +
+        '<div class="tg">' + window.T("conn.lastSync", { t: lastSync }) + '</div>' +
+        '<div class="mk-meter"><i data-w="' + sc.trust + '" style="background:' + meterColor(sc.trust) + '"></i></div></div>' +
+        '<p class="mk-hint" style="margin-top:10px">' + window.T("demo.engine") + '</p></div>' +
+      '</div>';
+
+    var kpis = '<div class="mk-grid4 mk-sec">' +
+      kpi({ k: window.T("cm.spend"), v: D.money(m.spend), d: deltaPct(m.spend, m.prevSpend), dir: dirOf(m.spend, m.prevSpend) }) +
+      kpi({ k: window.T("cm.leads"), v: D.num(m.leads), d: deltaPct(m.leads, m.prevLeads), dir: dirOf(m.leads, m.prevLeads), tg: window.T("l.target") + " " + D.num(T.leads) }) +
+      kpi({ k: "CPL", v: D.money(m.cpl), d: deltaPct(m.cpl, m.prevCpl), dir: dirOf(m.cpl, m.prevCpl, true), tg: window.T("l.target") + " " + D.money(T.cpl), m: D.clamp((T.cpl / Math.max(m.cpl, 1)) * 100) }) +
+      kpi({ k: "CTR", v: m.ctr + "%", tg: D.num(m.clicks) + " " + window.T("cm.clicks"), m: D.clamp(m.ctr * 22) }) +
+      '</div>';
+
+    var issBox = card(window.T("dash.needsNow"),
+      iss.length ? '<div class="mk-rows">' + iss.map(function (i) {
+        return '<button class="mk-row" data-issue="' + i.key + '">' + sevBox(i.sev) +
+          '<span><span class="ti">' + esc(i.title) + '</span><span class="me"><span>' + esc(i.deptName) + '</span>' +
+          '<span>· ' + esc(i.owner) + '</span></span></span><span class="go">→</span></button>';
+      }).join("") + '</div>' : '<p class="mk-hint">' + window.T("dash.noIssues") + '</p>',
+      '<a class="mk-btn mk-btn--sm" href="#/issues">' + window.T("nav.issues") + ' →</a>');
+
+    var rows = D.campaignRows().sort(function (a, b) { return b.spend - a.spend; }).slice(0, 8);
+    var camps = card(window.T("cm.title"), tbl([
+      { t: window.T("cm.name"), k: "n" }, { t: window.T("cm.platform"), k: "p" },
+      { t: window.T("cm.spend"), k: "s", num: true }, { t: window.T("cm.leads"), k: "l", num: true },
+      { t: "CPL", k: "cpl", num: true }, { t: "CTR", k: "ctr", num: true },
+      { t: window.T("cm.frequency"), k: "f", num: true }, { t: window.T("cm.alert"), k: "al" }
+    ], rows.map(function (c) {
+      return {
+        _id: c.id, n: '<span class="k">' + esc(c.name) + '</span>', p: c.platform === "google" ? "Google" : "Meta",
+        s: D.money(c.spend), l: D.num(c.leads), cpl: D.money(c.cpl), ctr: c.ctr + "%", f: c.freq || "—",
+        al: c.capped ? pill(window.T("cm.limited"), "medium")
+          : (c.freq >= 3.4 && c.ctrDelta <= -12) ? pill(window.T("cm.fatigue"), "high")
+          : c.cpl > T.cpl ? pill("CPL > " + D.money(T.cpl), "high") : pill(window.T("cm.healthy"), "low")
+      };
+    }), { clickAttr: "data-camp" }),
+      '<a class="mk-btn mk-btn--sm" href="#/campaigns">' + window.T("nav.campaigns") + ' →</a>');
+
+    return { html: head + note + mixed + top + kpis + '<div class="mk-sec">' + issBox + '</div><div class="mk-sec">' + camps + '</div>' };
+  }
+
   /* ---------------- funnel ---------------- */
   function funnelHTML(stages) {
     var max = Math.max.apply(null, stages.map(function (s) { return s.v; }).concat([1]));
@@ -198,6 +276,23 @@ window.MKT_VIEWS = (function () {
   }
   function funnel() {
     if (D.mode() === "empty") return { html: empty() };
+    if (!D.caps().leads) {
+      var ma = D.metrics();
+      var st = [
+        { k: "fn.ads", v: ma.impressions, target: null, dept: "marketing" },
+        { k: "fn.clicks", v: ma.clicks, target: 4, dept: "marketing" },
+        { k: "fn.landing", v: ma.landing, target: 90, dept: "it" },
+        { k: "fn.leads", v: ma.leads, target: 3, dept: "marketing" }
+      ];
+      st.forEach(function (x, i) {
+        x.rate = i === 0 ? 100 : D.pct(x.v, st[i - 1].v);
+        x.lost = i === 0 ? 0 : Math.max(0, st[i - 1].v - x.v);
+        x.leak = x.target != null && x.rate < x.target * 0.92;
+      });
+      return { html: '<div class="mk-h1">' + window.T("fn.title") + '</div><div class="mk-sub">' + window.T("fn.sub") + '</div>' +
+        '<div class="mk-sec">' + card(window.T("fn.title"), funnelHTML(st)) + '</div>' +
+        '<div class="mk-sec">' + needsSource() + '</div>' };
+    }
     var f = D.funnel(), m = D.metrics();
     var leaks = f.filter(function (s) { return s.leak; });
     var head = '<div class="mk-h1">' + window.T("fn.title") + '</div><div class="mk-sub">' + window.T("fn.sub") + '</div>';
@@ -250,7 +345,8 @@ window.MKT_VIEWS = (function () {
         '<span class="who">DriftX AI</span>' +
         pill(window.T("l.fact"), "info") + pill(window.T("l.est"), "medium") + pill(window.T("l.reco"), "violet") +
         '<span class="sp" style="margin-inline-start:auto"></span>' +
-        pill(window.T("l.confidence") + " " + a.confidence + "%", a.confidence >= 75 ? "low" : "medium") +
+        (a.confidence == null ? pill(window.T("l.noData"), "medium")
+          : pill(window.T("l.confidence") + " " + a.confidence + "%", a.confidence >= 75 ? "low" : "medium")) +
       '</div>' +
       '<div class="mk-blk"><div class="h">1 · ' + esc(window.MKT_P(DX.conclusion)) + '</div><p class="concl">' + esc(a.conclusion) + '</p></div>' +
       (a.support && a.support.length ? '<div class="mk-blk"><div class="h">2 · ' + esc(window.MKT_P(DX.support)) + ' ' + pill(window.T("l.fact"), "info") + '</div>' +
@@ -365,6 +461,7 @@ window.MKT_VIEWS = (function () {
   var leadFilter = "all";
   function leads() {
     if (D.mode() === "empty") return { html: empty() };
+    if (!D.caps().leads) return { html: '<div class="mk-h1">' + window.T("ld.title") + '</div>' + needsSource() };
     var m = D.metrics();
     var all = m.rows.slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
     var filtered = leadFilter === "all" ? all : all.filter(function (l) { return l.flags.indexOf(leadFilter) >= 0; });
@@ -405,6 +502,7 @@ window.MKT_VIEWS = (function () {
   /* ---------------- team ---------------- */
   function team() {
     if (D.mode() === "empty") return { html: empty() };
+    if (!D.caps().leads) return { html: '<div class="mk-h1">' + window.T("tm.title") + '</div>' + needsSource() };
     var emps = D.employeeRows(), T = D.targets();
     var head = '<div class="mk-h1">' + window.T("tm.title") + '</div><div class="mk-sub">' + window.T("tm.sub") + '</div>';
     var body = tbl([
@@ -430,6 +528,7 @@ window.MKT_VIEWS = (function () {
   }
 
   function teamDetail(id) {
+    if (!D.caps().leads) return { html: needsSource() };
     var emps = D.employeeRows(), e = emps.filter(function (x) { return x.id === id; })[0];
     if (!e) return { html: empty() };
     var T = D.targets(), best = emps[0];
@@ -577,6 +676,7 @@ window.MKT_VIEWS = (function () {
   function web() {
     if (D.mode() === "empty") return { html: empty() };
     var m = D.metrics(), st = m.site;
+    if (!st) return { html: '<div class="mk-h1">' + window.T("wb.title") + '</div>' + needsSource() };
     var head = '<div class="mk-h1">' + window.T("wb.title") + '</div>';
     var kp = '<div class="mk-grid4 mk-sec">' +
       kpi({ k: window.T("wb.uptime"), v: st.uptime.toFixed(2) + "%", m: D.clamp(st.uptime), tg: window.T("l.target") + " 99.9%" }) +
@@ -602,6 +702,7 @@ window.MKT_VIEWS = (function () {
   function reputation() {
     if (D.mode() === "empty") return { html: empty() };
     var m = D.metrics(), cx = m.cx, camps = D.campaignRows();
+    if (!cx) return { html: '<div class="mk-h1">' + window.T("rep.title") + '</div>' + needsSource() };
     var oldest = camps.slice().sort(function (a, b) { return b.freq - a.freq; })[0];
     var head = '<div class="mk-h1">' + window.T("rep.title") + '</div>';
     var kp = '<div class="mk-grid4 mk-sec">' +
@@ -685,6 +786,7 @@ window.MKT_VIEWS = (function () {
   /* ---------------- reports ---------------- */
   function reports() {
     if (D.mode() === "empty") return { html: empty() };
+    if (!D.caps().leads) return reportsAds();
     var s = D.state(), m = D.metrics(), sc = D.scores(), T = D.targets();
     var iss = E.issues(), open = iss.filter(function (i) { return i.status !== "closed"; });
     var fixed = iss.filter(function (i) { return i.status === "closed" || i.status === "pendingCheck"; });
@@ -740,6 +842,42 @@ window.MKT_VIEWS = (function () {
       '<div><h3>' + window.T("rp.nextWeek") + '</h3><ul class="mk-ul">' + open.slice(0, 3).map(function (i) {
         return '<li>' + esc(i.ver) + '</li>';
       }).join("") + '</ul></div>' +
+      '</div>';
+    return { html: head + rep };
+  }
+
+  /* ---------------- reports: ads-only ---------------- */
+  function reportsAds() {
+    var s = D.state(), m = D.metrics(), sc = D.scores(), T = D.targets();
+    var iss = E.openIssues();
+    var rows = D.campaignRows().sort(function (a, b) { return b.spend - a.spend; });
+    var head = '<div class="mk-h1">' + window.T("rp.title") + '</div>' +
+      '<div class="mk-sub">' + window.T("rp.generated", { t: fmtDT(Date.now()), biz: (s.biz && s.biz.name) || "—", trust: sc.trust }) + '</div>' +
+      '<div style="margin-top:12px"><button class="mk-btn mk-btn--pri mk-btn--sm" data-act="print">' + window.T("l.export") + '</button></div>';
+    var rep = '<div class="mk-rep mk-sec">' +
+      '<div><h2>' + window.T("rp.weekly") + '</h2><p class="mk-hint">' + pill(window.T("live.badge"), "low") + ' ' + window.T("src.adsCovers") + '</p></div>' +
+      '<div><h3>' + window.T("rp.kpiVs") + '</h3>' + tbl([
+        { t: "KPI", k: "k" }, { t: window.T("l.actual"), k: "a", num: true },
+        { t: window.T("l.target"), k: "t", num: true }, { t: window.T("dash.vsPrev"), k: "p", num: true }
+      ], [
+        { k: window.T("cm.spend"), a: D.money(m.spend), t: "—", p: deltaPct(m.spend, m.prevSpend) },
+        { k: window.T("cm.leads"), a: D.num(m.leads), t: D.num(T.leads), p: deltaPct(m.leads, m.prevLeads) },
+        { k: "CPL", a: D.money(m.cpl), t: D.money(T.cpl), p: deltaPct(m.cpl, m.prevCpl) },
+        { k: "CTR", a: m.ctr + "%", t: "—", p: "—" },
+        { k: window.T("cm.clicks"), a: D.num(m.clicks), t: "—", p: "—" }
+      ]) + '</div>' +
+      '<div><h3>' + window.T("cm.title") + '</h3>' + tbl([
+        { t: window.T("cm.name"), k: "n" }, { t: window.T("cm.spend"), k: "s", num: true },
+        { t: window.T("cm.leads"), k: "l", num: true }, { t: "CPL", k: "cpl", num: true },
+        { t: "CTR", k: "ctr", num: true }, { t: window.T("cm.alert"), k: "al" }
+      ], rows.map(function (c) {
+        return { n: c.name, s: D.money(c.spend), l: D.num(c.leads), cpl: D.money(c.cpl), ctr: c.ctr + "%",
+          al: c.capped ? window.T("cm.limited") : (c.freq >= 3.4 && c.ctrDelta <= -12) ? window.T("cm.fatigue") : window.T("cm.healthy") };
+      })) + '</div>' +
+      '<div><h3>' + window.T("rp.openIssues") + '</h3><ul class="mk-ul">' + (iss.length ? iss.map(function (i) {
+        return '<li>' + esc(i.title) + ' — ' + i.sev.band + ' · ' + esc(i.owner) + '</li>';
+      }).join("") : '<li>' + window.T("dash.noIssues") + '</li>') + '</ul></div>' +
+      '<div class="dec"><h3>' + window.T("src.needTitle") + '</h3><p>' + window.T("src.needBody") + '</p></div>' +
       '</div>';
     return { html: head + rep };
   }
@@ -877,7 +1015,34 @@ window.MKT_VIEWS = (function () {
         return '<button class="mk-tab ' + (setTab === t[0] ? "on" : "") + '" data-settab="' + t[0] + '">' + window.T(t[1]) + '</button>';
       }).join("") + '</div>';
     var body = "";
-    if (setTab === "conns") body = card(window.T("se.conns"), forms.conns());
+    if (setTab === "conns") {
+      var srv = "";
+      if (window.MKT_REMOTE && window.MKT_REMOTE.serverMode()) {
+        var rem = D.remote();
+        var conns = (rem && rem.connections) || null;
+        srv = card(window.T("se.serverConns"),
+          '<div class="mk-conns">' + ["meta", "google"].map(function (k) {
+            var c = (conns && conns[k]) || { status: "off", configured: false };
+            var dot = c.status === "on" ? "ok" : c.status === "err" ? "bad" : c.status === "auth" ? "warn" : "off";
+            var label = c.status === "on" ? window.T("conn.connected") : c.status === "err" ? window.T("conn.syncErr")
+              : c.status === "auth" ? window.T("conn.needsAuth") : window.T("conn.off");
+            return '<div class="mk-conn ' + (c.status === "on" ? "on" : c.status === "err" ? "err" : "") + '">' +
+              '<div class="hd"><span class="mk-dot ' + dot + '"></span><span class="nm">' +
+              (k === "meta" ? "Meta Ads" : "Google Ads") + '</span><span class="sp"></span>' +
+              pill(label, c.status === "on" ? "low" : c.status === "err" ? "critical" : "neutral") + '</div>' +
+              '<div class="mt"><span>' + window.T("conn.lastSync", { t: c.lastSync ? fmtDT(Date.parse(String(c.lastSync).replace(" ", "T") + "Z")) : window.T("conn.never") }) + '</span>' +
+              (c.apiVersion ? '<span>API ' + esc(c.apiVersion) + '</span>' : '') +
+              (c.error ? '<span class="bad" style="color:var(--bad)">' + esc(String(c.error).slice(0, 140)) + '</span>' : '') +
+              '</div><div class="acts">' +
+              '<button class="mk-btn mk-btn--sm mk-btn--pri" data-act="sync-now" data-provider="' + k + '">' + window.T("live.syncNow") + '</button>' +
+              (k === "google" ? '<a class="mk-btn mk-btn--sm" href="/api/oauth/google/start">' + window.T("se.connectGoogle") + '</a>' : '') +
+              '</div></div>';
+          }).join("") + '</div>' +
+          '<p class="mk-hint" style="margin-top:12px">' + window.T("se.serverMode") + ' · ' + window.T("src.adsCovers") + '</p>',
+          '<button class="mk-btn mk-btn--sm" data-act="sync-now" data-provider="all">' + window.T("live.syncNow") + '</button>');
+      }
+      body = srv + (srv ? '<div class="mk-sec">' : '') + card(window.T("se.conns"), forms.conns()) + (srv ? '</div>' : '');
+    }
     else if (setTab === "business") body = card(window.T("se.business"), forms.biz(),
       '<button class="mk-btn mk-btn--pri mk-btn--sm" data-act="save-biz">' + window.T("l.save") + '</button>');
     else if (setTab === "depts") body = card(window.T("se.depts"), forms.depts());

@@ -40,6 +40,12 @@ window.MKT_DATA = (function () {
   }
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+    /* in server mode the same state is shared with the rest of the team */
+    if (window.MKT_REMOTE && window.MKT_REMOTE.serverMode && window.MKT_REMOTE.serverMode()) {
+      var copy = {};
+      Object.keys(S).forEach(function (k) { if (k !== "user") copy[k] = S[k]; });
+      window.MKT_REMOTE.saveState(copy);
+    }
   }
   function state() { return S; }
   function set(patch) { Object.keys(patch).forEach(function (k) { S[k] = patch[k]; }); save(); }
@@ -75,8 +81,22 @@ window.MKT_DATA = (function () {
   function connectedKeys() {
     return Object.keys(S.conns).filter(function (k) { return S.conns[k] && S.conns[k].status === "on"; });
   }
-  function hasSource() { return S.demo === true || connectedKeys().length > 0; }
-  function mode() { return hasSource() ? "demo" : "empty"; }
+
+  /* ---- server payload (live ad-platform data), set by mkt-remote ---- */
+  var REMOTE = null;
+  function setRemote(p) { REMOTE = p; CACHE = null; }
+  function remote() { return REMOTE; }
+  function live() { return !!(REMOTE && REMOTE.campaigns && REMOTE.campaigns.length); }
+  /* what the connected sources can actually answer — ads only until a CRM or a
+     lead-level source exists, and the UI says so instead of inventing numbers */
+  function caps() {
+    if (live()) {
+      return REMOTE.capabilities || { ads: true, leads: false, sales: false };
+    }
+    return { ads: true, leads: true, sales: true };
+  }
+  function hasSource() { return live() || S.demo === true || connectedKeys().length > 0; }
+  function mode() { return live() ? "live" : (hasSource() ? "demo" : "empty"); }
 
   /* ============================ dataset ============================ */
   function hash(str) {
@@ -102,7 +122,41 @@ window.MKT_DATA = (function () {
   var CACHE = null;
   function invalidate() { CACHE = null; }
 
+  /* real campaigns from Google Ads / Meta, shaped like the internal dataset */
+  function liveDataset() {
+    var sig = "live|" + REMOTE.campaigns.length + "|" + (REMOTE.since || "") + "|" +
+      REMOTE.campaigns.reduce(function (a, c) { return a + c.days.length; }, 0);
+    if (CACHE && CACHE.sig === sig) return CACHE;
+    var seen = {};
+    REMOTE.campaigns.forEach(function (c) { (c.days || []).forEach(function (d) { seen[d.day] = true; }); });
+    var keys = Object.keys(seen).sort();
+    var idx = {};
+    keys.forEach(function (k, i) { idx[k] = i; });
+    var camps = REMOTE.campaigns.map(function (c) {
+      var dd = (c.days || []).map(function (d) {
+        return {
+          d: idx[d.day], ts: Date.parse(d.day + "T12:00:00Z"),
+          spend: +d.spend || 0, clicks: +d.clicks || 0, impressions: +d.impressions || 0,
+          leads: +d.leads || 0, conversions: +d.conversions || 0,
+          ctr: d.impressions > 0 ? d.clicks / d.impressions : 0, freq: +d.frequency || 0
+        };
+      }).sort(function (a, b) { return a.d - b.d; });
+      return {
+        id: c.id, name: c.name, platform: c.provider, country: c.country || "—",
+        quality: 0, cpc: 0, fatigue: false, status: c.status, currency: c.currency || "",
+        budget: c.dailyBudget || 0, capped: !!c.capped, days: dd,
+        spend: dd.reduce(function (s, x) { return s + x.spend; }, 0),
+        impressions: dd.reduce(function (s, x) { return s + x.impressions; }, 0),
+        clicks: dd.reduce(function (s, x) { return s + x.clicks; }, 0)
+      };
+    });
+    CACHE = { sig: sig, camps: camps, leads: [], emps: [], cx: null, site: null,
+      days: Math.max(1, keys.length), now: Date.now(), live: true };
+    return CACHE;
+  }
+
   function dataset() {
+    if (live()) return liveDataset();
     if (!hasSource()) return null;
     var biz = S.biz || {};
     var sig = [biz.name, biz.leadsMo, biz.budget, biz.avgDeal, biz.reps, (biz.countries || []).join(""),
@@ -425,6 +479,38 @@ window.MKT_DATA = (function () {
     m.landing = Math.round(sp.clicks * 0.9);
     m.rows = cur;
     m.dataset = ds;
+    m.caps = caps();
+    m.live = !!ds.live;
+
+    /* Ads-only source: the platforms report spend, delivery and a lead COUNT —
+       nothing about what happened to those leads. Everything downstream is set
+       to null so the UI states "no source" instead of showing a computed zero. */
+    if (!m.caps.leads) {
+      var sumLeads = function (from, to) {
+        var t = 0;
+        ds.camps.forEach(function (c) {
+          if (f.country !== "all" && c.country !== f.country) return;
+          if (f.source === "google" && c.platform !== "google") return;
+          if (f.source === "meta" && c.platform !== "meta") return;
+          c.days.forEach(function (d) { if (d.d >= from && d.d < to) t += d.leads; });
+        });
+        return t;
+      };
+      m.leads = Math.round(sumLeads(ds.days - range, ds.days));
+      m.prevLeads = Math.round(sumLeads(ds.days - range * 2, ds.days - range));
+      m.cpl = m.leads ? Math.round(sp.spend / m.leads) : 0;
+      m.prevCpl = m.prevLeads ? Math.round(spPrev.spend / m.prevLeads) : 0;
+      m.platformLeads = true;
+      ["crm", "captureRate", "assigned", "noOwner", "contacted", "contactRate", "qualified",
+        "qualifiedRate", "prevQualifiedRate", "followed", "followRate", "appts", "apptRate",
+        "won", "paid", "revenue", "prevRevenue", "closeRate", "closeRateAll", "prevCloseRate",
+        "respMedian", "prevRespMedian", "slaMetPct", "avgAttempts", "prevAvgAttempts", "avgQuality",
+        "utmCoverage", "lost", "lostNoReason", "lostReasonCoverage", "dup", "cpql", "cac", "roas",
+        "singleAttemptPct"].forEach(function (k) { m[k] = null; });
+      m.cx = null;
+      m.site = null;
+      m.rows = [];
+    }
     return m;
   }
 
@@ -453,6 +539,26 @@ window.MKT_DATA = (function () {
         dd.slice(half).reduce(function (s, x) { return s + x.impressions; }, 0));
       var freq = dd.length ? dd[dd.length - 1].freq : 0;
       var crmCount = ls.filter(function (l) { return l.crmAt; }).length;
+      if (ds.live) {
+        /* platform-reported leads; qualification, deals and revenue need a CRM */
+        var plLeads = Math.round(dd.reduce(function (s, x) { return s + x.leads; }, 0));
+        var half0 = Math.floor(dd.length / 2);
+        var early = pct(dd.slice(0, half0).reduce(function (s, x) { return s + x.clicks; }, 0),
+          dd.slice(0, half0).reduce(function (s, x) { return s + x.impressions; }, 0));
+        var late = pct(dd.slice(half0).reduce(function (s, x) { return s + x.clicks; }, 0),
+          dd.slice(half0).reduce(function (s, x) { return s + x.impressions; }, 0));
+        return {
+          id: c.id, name: c.name, platform: c.platform, country: c.country, capped: c.capped,
+          budget: (c.budget || 0) * dd.length, spend: spend, impressions: impressions, clicks: clicks,
+          ctr: pct(clicks, impressions), cpc: clicks ? Math.round((spend / clicks) * 100) / 100 : 0,
+          leads: plLeads, crm: null, gap: null,
+          cpl: plLeads ? Math.round(spend / plLeads) : 0,
+          qleads: null, cpql: null, deals: null, revenue: null, roas: null,
+          freq: Math.round(freq * 10) / 10,
+          ctrDelta: early ? Math.round(((late - early) / early) * 100) : 0,
+          days: dd, rows: [], live: true, currency: c.currency
+        };
+      }
       return {
         id: c.id, name: c.name, platform: c.platform, country: c.country, capped: c.capped,
         budget: c.budget * range, spend: spend, impressions: impressions, clicks: clicks,
@@ -561,6 +667,34 @@ window.MKT_DATA = (function () {
   function scores(range, filters) {
     var m = metrics(range, filters); if (!m) return null;
     var T = targets();
+
+    /* Ads-only: score what the source can prove, and refuse the rest. An
+       overall business score without sales data would be a guess. */
+    if (!m.caps.leads) {
+      var fresh = 100;
+      if (REMOTE && REMOTE.connections) {
+        var stamps = [];
+        Object.keys(REMOTE.connections).forEach(function (k) {
+          var c = REMOTE.connections[k];
+          if (c && c.lastSync) stamps.push(Date.parse(c.lastSync.replace(" ", "T") + "Z"));
+        });
+        if (!stamps.length) fresh = 40;
+        else {
+          var hrs = (Date.now() - Math.max.apply(null, stamps)) / 3600000;
+          fresh = clamp(100 - Math.max(0, hrs - 2) * 3);
+        }
+      }
+      var mk = clamp(ratioScore(m.cpl, T.cpl, true) * 0.6 + Math.min(100, m.ctr * 22) * 0.4);
+      /* ads-only coverage cannot cross-check itself against a CRM, so
+         reliability is capped: fresh data is not the same as complete data */
+      var trust = Math.min(80, fresh);
+      return {
+        overall: null, gated: true, adsOnly: true, trust: trust, funnel: null,
+        marketing: mk, sales: null, cx: null, implementation: implementationScore(),
+        band: mk >= 85 ? "green" : mk >= 70 ? "yellow" : mk >= 50 ? "orange" : "red"
+      };
+    }
+
     var conns = connectedKeys().length;
     var freshness = conns ? 92 : 70;
 
@@ -611,6 +745,7 @@ window.MKT_DATA = (function () {
 
   return {
     KEY: KEY, state: state, set: set, save: save, wipe: wipe, invalidate: invalidate,
+    setRemote: setRemote, remote: remote, live: live, caps: caps,
     targets: targets, DEFAULT_TARGETS: DEFAULT_TARGETS, currency: currency, money: money, num: num, pct: pct,
     connectedKeys: connectedKeys, hasSource: hasSource, mode: mode,
     dataset: dataset, metrics: metrics, campaignRows: campaignRows, employeeRows: employeeRows,

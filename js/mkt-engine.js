@@ -38,9 +38,15 @@ window.MKT_ENGINE = (function () {
     var avgDeal = m.won ? Math.round(m.revenue / m.won) : (parseFloat(s.biz && s.biz.avgDeal) || 3000);
     var closeOdds = Math.max(0.02, m.closeRateAll / 100);
 
+    /* With ad platforms only, a detector that needs lead-level records cannot
+       fire — its inputs do not exist. Emit only what the source can prove. */
+    var ADS_ONLY_KEYS = ["cplUp", "fatigue"];
+    var adsOnly = !m.caps.leads;
+
     function add(key, o) {
       var tpl = window.MKT_ISS[key];
       if (!tpl) return;
+      if (adsOnly && ADS_ONLY_KEYS.indexOf(key) < 0) return;
       var st = s.issues[key] || {};
       out.push({
         key: key, id: "INC-" + String(out.length + 101),
@@ -63,7 +69,7 @@ window.MKT_ENGINE = (function () {
 
     /* 1 — capture gap */
     var missing = m.leads - m.crm;
-    if (m.leads > 20 && m.captureRate < 99) {
+    if (m.captureRate != null && m.leads > 20 && m.captureRate < 99) {
       add("captureGap", {
         vars: { n: missing, p: Math.round(100 - m.captureRate) },
         sev: sev(missing > m.leads * 0.1 ? 5 : 4, 5, 2, 1),
@@ -78,7 +84,7 @@ window.MKT_ENGINE = (function () {
       });
     }
     /* 2 — first response SLA */
-    if (m.respN !== 0 && m.respMedian > T.resp) {
+    if (m.respMedian != null && m.respMedian > T.resp) {
       var late = Math.round(m.leads * (1 - m.slaMetPct / 100));
       add("slaBreach", {
         vars: { v: fmtMin(m.respMedian), t: fmtMin(T.resp) },
@@ -93,7 +99,7 @@ window.MKT_ENGINE = (function () {
       });
     }
     /* 3 — no follow-up */
-    if (m.singleAttemptPct > 25) {
+    if (m.singleAttemptPct != null && m.singleAttemptPct > 25) {
       add("noFollowup", {
         vars: { p: Math.round(m.singleAttemptPct), t: T.attempts },
         sev: sev(4, 3, 2, 0.95),
@@ -116,14 +122,15 @@ window.MKT_ENGINE = (function () {
         evidence: [
           "CPL " + D.money(m.cpl) + " · target " + D.money(T.cpl),
           "Previous period: " + D.money(m.prevCpl),
-          "CPQL " + D.money(m.cpql) + " · limit " + D.money(T.cpql)
+          m.cpql != null ? ("CPQL " + D.money(m.cpql) + " · limit " + D.money(T.cpql))
+            : ("Leads (platform-reported): " + D.num(m.leads))
         ],
         metric: { name: "cpl", actual: m.cpl, target: T.cpl, dir: "down" }
       });
     }
     /* 5 — quality drop */
-    var baseline = Math.max(m.prevQualifiedRate, 40);
-    if (m.qualifiedRate < baseline - 6) {
+    var baseline = Math.max(m.prevQualifiedRate || 0, 40);
+    if (m.qualifiedRate != null && m.qualifiedRate < baseline - 6) {
       add("qualityDrop", {
         vars: { p: m.qualifiedRate, t: Math.round(baseline) },
         sev: sev(4, 4, 2, 0.9),
@@ -173,7 +180,7 @@ window.MKT_ENGINE = (function () {
       });
     }
     /* 8 — UTM coverage */
-    if (m.utmCoverage < 92) {
+    if (m.utmCoverage != null && m.utmCoverage < 92) {
       add("utmMissing", {
         vars: { p: Math.round(100 - m.utmCoverage) },
         sev: sev(3, 3, 3, 0.8),
@@ -187,7 +194,7 @@ window.MKT_ENGINE = (function () {
       });
     }
     /* 9 — unassigned */
-    if (m.noOwner > 0) {
+    if (m.noOwner != null && m.noOwner > 0) {
       add("unassigned", {
         vars: { n: m.noOwner },
         sev: sev(3, 4, 1, 1), leads: m.noOwner,
@@ -197,7 +204,7 @@ window.MKT_ENGINE = (function () {
       });
     }
     /* 10 — lost reason coverage */
-    if (m.lost > 5 && m.lostReasonCoverage < 90) {
+    if (m.lost != null && m.lost > 5 && m.lostReasonCoverage < 90) {
       add("lostReason", {
         vars: { p: Math.round(100 - m.lostReasonCoverage) },
         sev: sev(2, 2, 2, 1), dueH: 96,
@@ -209,7 +216,7 @@ window.MKT_ENGINE = (function () {
       });
     }
     /* 11 — duplicates */
-    if (m.dup > Math.max(3, m.leads * 0.01)) {
+    if (m.dup != null && m.dup > Math.max(3, m.leads * 0.01)) {
       add("duplicates", {
         vars: { n: m.dup }, sev: sev(2, 2, 2, 0.9), leads: m.dup, dueH: 96,
         evidence: ["Duplicates: " + m.dup + " of " + m.leads + " (" + D.pct(m.dup, m.leads) + "%)"],
@@ -217,7 +224,7 @@ window.MKT_ENGINE = (function () {
       });
     }
     /* 12 — reviews SLA */
-    if (m.cx.negUnanswered > 0) {
+    if (m.cx && m.cx.negUnanswered > 0) {
       add("reviewsSla", {
         vars: { n: m.cx.negUnanswered }, sev: sev(3, 4, 2, 0.95), dueH: 24,
         evidence: [
@@ -229,7 +236,7 @@ window.MKT_ENGINE = (function () {
       });
     }
     /* 13 — site health */
-    if (m.site.checksFailing > 0) {
+    if (m.site && m.site.checksFailing > 0) {
       add("siteHealth", {
         vars: { n: m.site.checksFailing }, sev: sev(4, 5, 2, 1), dueH: 2,
         evidence: [
@@ -336,19 +343,21 @@ window.MKT_ENGINE = (function () {
   }
 
   function splitBlame(m, T) {
+    /* a split across departments needs lead-level data on every side of it */
+    if (!m.caps || !m.caps.leads) return null;
     /* each dimension: how far outside its own target, normalised 0..1 */
     function dev(actual, target, lowerIsBetter) {
-      if (!target) return 0;
+      if (actual == null || !target) return 0;
       var d = lowerIsBetter ? (actual - target) / target : (target - actual) / target;
       return Math.max(0, Math.min(1.4, d));
     }
     var mk = dev(m.cpl, T.cpl, true) * 0.5 + dev(m.qualifiedRate, 45) * 0.5;
     var sl = dev(m.respMedian, T.resp, true) * 0.4 + dev(m.avgAttempts, T.attempts) * 0.3 + dev(m.closeRate, T.close) * 0.3;
     var it = dev(m.captureRate, 99) * 0.6 + dev(m.utmCoverage, 95) * 0.4;
-    var cx = dev(m.cx.rating, 4.5) * 0.5 + dev(m.cx.slaMet, 90) * 0.5;
+    var cx = m.cx ? (dev(m.cx.rating, 4.5) * 0.5 + dev(m.cx.slaMet, 90) * 0.5) : 0;
     var ext = 0.06;
     var tot = mk + sl + it + cx + ext;
-    if (tot <= 0) return [];
+    if (!isFinite(tot) || tot <= 0) return null;
     function p(v) { return Math.round((v / tot) * 100); }
     var rowsOut = [
       { k: "marketing", t: deptName("marketing"), p: p(mk) },
@@ -374,6 +383,15 @@ window.MKT_ENGINE = (function () {
     var camps = D.campaignRows(range, filters);
     var conf = D.clamp(sc.trust * 0.6 + Math.min(100, (m.leads / 120) * 100) * 0.4);
     var out = { key: key, confidence: conf, sources: sources(), split: null, support: [], actions: [], conclusion: "" };
+
+    /* questions about what happened after the lead need a lead-level source */
+    if (!m.caps.leads && ["salesDown", "notClosing", "whose", "training"].indexOf(key) >= 0) {
+      out.conclusion = window.MKT_P(window.MKT_DX.needLeads);
+      out.confidence = null;
+      out.needsSource = true;
+      out.support = [window.MKT_P(window.MKT_STR["src.adsCovers"])];
+      return out;
+    }
 
     function moneyPct(a, b) { return b ? Math.round(((a - b) / b) * 100) : 0; }
 
@@ -415,6 +433,23 @@ window.MKT_ENGINE = (function () {
       out.split = splitBlame(m, T);
       out.actions = iss.slice(0, 4).map(function (i) { return { t: i.corr, issue: i.key, owner: i.owner }; });
     } else if (key === "cplUp") {
+      if (!m.caps.leads) {
+        /* no qualification data: the honest comparison is cost per lead */
+        var byCpl = camps.slice().filter(function (c) { return c.leads > 0; }).sort(function (a, b) { return b.cpl - a.cpl; });
+        var hi = byCpl[0], lo = byCpl[byCpl.length - 1];
+        out.conclusion = hi ? L(
+          "CPL is " + D.money(m.cpl) + " against a " + D.money(T.cpl) + " target. The spread between campaigns is where the money goes: " + hi.name + " pays " + D.money(hi.cpl) + " per lead while " + lo.name + " pays " + D.money(lo.cpl) + ". Whether the cheaper leads are also better leads cannot be answered without a CRM.",
+          "ה-CPL הוא " + D.money(m.cpl) + " מול יעד " + D.money(T.cpl) + ". הפער בין הקמפיינים הוא לאן הכסף הולך: " + hi.name + " משלם " + D.money(hi.cpl) + " לליד בעוד " + lo.name + " משלם " + D.money(lo.cpl) + ". האם הלידים הזולים גם טובים יותר — אי אפשר לענות בלי CRM.",
+          "تكلفة العميل " + D.money(m.cpl) + " مقابل هدف " + D.money(T.cpl) + ". والفارق بين الحملات هو حيث يذهب المال: " + hi.name + " يدفع " + D.money(hi.cpl) + " للعميل بينما " + lo.name + " يدفع " + D.money(lo.cpl) + ". أما إن كان العميل الأرخص أفضل أيضاً فلا جواب دون CRM."
+        ) : window.MKT_P(window.MKT_DX.noData);
+        out.support = camps.map(function (c) {
+          return L(c.name + ": spend " + D.money(c.spend) + ", leads " + c.leads + ", CPL " + D.money(c.cpl) + ", CTR change " + c.ctrDelta + "%, frequency " + c.freq + ".",
+            c.name + ": הוצאה " + D.money(c.spend) + ", לידים " + c.leads + ", CPL " + D.money(c.cpl) + ", שינוי CTR " + c.ctrDelta + "%, Frequency " + c.freq + ".",
+            c.name + ": إنفاق " + D.money(c.spend) + "، عملاء " + c.leads + "، تكلفة عميل " + D.money(c.cpl) + "، تغيّر CTR " + c.ctrDelta + "%، تكرار " + c.freq + ".");
+        });
+        out.actions = iss.map(function (i) { return { t: i.corr, issue: i.key, owner: i.owner }; });
+        return out;
+      }
       var worst = camps.slice().sort(function (a, b) { return b.cpql - a.cpql; })[0];
       var best = camps.slice().filter(function (c) { return c.qleads > 0; }).sort(function (a, b) { return a.cpql - b.cpql; })[0];
       out.conclusion = L(
@@ -481,15 +516,32 @@ window.MKT_ENGINE = (function () {
       camps.forEach(function (c) {
         byC[c.country] = byC[c.country] || { c: c.country, spend: 0, leads: 0, q: 0, deals: 0, rev: 0 };
         byC[c.country].spend += c.spend; byC[c.country].leads += c.leads;
-        byC[c.country].q += c.qleads; byC[c.country].deals += c.deals; byC[c.country].rev += c.revenue;
+        byC[c.country].q += (c.qleads || 0); byC[c.country].deals += (c.deals || 0); byC[c.country].rev += (c.revenue || 0);
       });
+      var adsOnlyMarket = !m.caps.leads;
       var arr = Object.keys(byC).map(function (k) {
         var x = byC[k];
-        x.roas = x.spend ? Math.round((x.rev / x.spend) * 100) / 100 : 0;
-        x.cpql = x.q ? Math.round(x.spend / x.q) : 0;
+        x.roas = (!adsOnlyMarket && x.spend) ? Math.round((x.rev / x.spend) * 100) / 100 : null;
+        x.cpql = (!adsOnlyMarket && x.q) ? Math.round(x.spend / x.q) : null;
+        x.cpl = x.leads ? Math.round(x.spend / x.leads) : 0;
         return x;
-      }).sort(function (a, b) { return b.roas - a.roas; });
+      }).sort(function (a, b) {
+        return adsOnlyMarket ? (a.cpl - b.cpl) : (b.roas - a.roas);
+      });
       var w = arr[0];
+      if (adsOnlyMarket) {
+        out.conclusion = w ? L(
+          w.c + " is the cheapest market at " + D.money(w.cpl) + " per lead, against " + D.money(arr[arr.length - 1].cpl) + " in " + arr[arr.length - 1].c + ". Cost per lead is as far as ad data goes — which market actually converts needs a CRM.",
+          w.c + " הוא השוק הזול ביותר עם " + D.money(w.cpl) + " לליד, מול " + D.money(arr[arr.length - 1].cpl) + " ב" + arr[arr.length - 1].c + ". עלות לליד היא עד כמה שנתוני הפרסום מגיעים — איזה שוק באמת ממיר דורש CRM.",
+          w.c + " هو الأرخص بـ" + D.money(w.cpl) + " للعميل، مقابل " + D.money(arr[arr.length - 1].cpl) + " في " + arr[arr.length - 1].c + ". تكلفة العميل هي أقصى ما تصله بيانات الإعلانات — أما أي سوق يحوّل فعلاً فيحتاج CRM."
+        ) : window.MKT_P(window.MKT_DX.noData);
+        out.support = arr.map(function (x) {
+          return L(x.c + ": spend " + D.money(x.spend) + ", leads " + x.leads + ", CPL " + D.money(x.cpl) + ".",
+            x.c + ": הוצאה " + D.money(x.spend) + ", לידים " + x.leads + ", CPL " + D.money(x.cpl) + ".",
+            x.c + ": إنفاق " + D.money(x.spend) + "، عملاء " + x.leads + "، تكلفة عميل " + D.money(x.cpl) + ".");
+        });
+        return out;
+      }
       var volRank = w ? arr.slice().sort(function (a, b) { return b.leads - a.leads; }).map(function (x) { return x.c; }).indexOf(w.c) + 1 : 0;
       var mismatch = volRank > 1;
       out.conclusion = w ? L(

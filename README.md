@@ -33,8 +33,9 @@ js/mkt-app.js           Shell, router, sign-in, onboarding, wiring
 `/ai-marketing/` sells the product. **`/ai-marketing/app/` is the product**: a working
 front-end system, not a landing page.
 
-- **Sign-in** — email only. The password field is never read, stored or sent; Google SSO,
-  password reset and 2FA are shown as disabled because they need a server.
+- **Sign-in** — in server mode the password is verified server-side (bcrypt, HttpOnly
+  session cookie, throttled). Without `/api` the app runs browser-only and the password
+  field is never read, stored or sent; Google SSO, reset and 2FA state that they need a server.
 - **Onboarding (5 steps)** — business profile, departments + owners, 12 data connections,
   11 targets, 18-question assessment. Saved to `localStorage` under `driftx_mkt_v1`.
 - **14 screens** — dashboard, AI diagnosis, funnel, campaigns (+ drill-down), leads,
@@ -56,10 +57,23 @@ front-end system, not a landing page.
   reliability drops below 60.
 - Full EN/HE/AR with RTL, dark + light theme, mobile drawer.
 
-### What needs a backend
-Real accounts and sessions, a shared database, live OAuth tokens for Google/Meta/CRM,
-scheduled syncs, server-side reports and email delivery. The client is structured so
-`js/mkt-data.js` is the only place that has to change.
+### Server mode — `/api/` (Plesk + PHP 8.2 + MySQL)
+The system now has a backend. When `/api` answers, the app switches to **server mode**:
+real sessions (bcrypt + HttpOnly cookie), state shared across the team in MySQL, and
+live campaign data synced from **Google Ads** and **Meta Ads** every 30 minutes.
+When `/api` is absent it falls back to the browser-only mode above, unchanged.
+
+Setup, credentials and the scheduled task: see [api/README.md](api/README.md).
+
+Ads platforms report campaign performance, not individual leads — so in server mode
+the lead, team, site and reputation screens say *"this screen needs a lead-level
+source"*, the overall business score stays withheld, and reliability is capped at 80.
+Connecting a CRM later turns those back on.
+
+### What still needs building
+CRM / lead-forms connector (the one thing that unlocks the whole sales half of the
+system), payments for revenue and ROAS, reviews and service sources, team invites with
+per-role permissions, and email delivery of the weekly report.
 
 ## Marketing Control Tower — `/ai-marketing/`
 The AI marketing performance control system (`DRIFTX_AI_Marketing_Control_System_Spec_HE.docx`)

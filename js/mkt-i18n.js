@@ -54,6 +54,17 @@ window.MKT_STR = {
     "כניסה עם Google, איפוס סיסמה ואימות דו-שלבי דורשים את שרת DriftX. הם כבויים בגרסה הזו.",
     "الدخول عبر Google وإعادة تعيين كلمة المرور والتحقق بخطوتين تتطلب خادم DriftX، وهي معطّلة في هذه النسخة."
   ],
+  "auth.serverNote": [
+    "This is a real account on the DriftX server: the password is verified server-side and the session is an HttpOnly cookie. Your business data, issues and tasks are shared with your team.",
+    "זה חשבון אמיתי על שרת DriftX: הסיסמה נבדקת בצד השרת והסשן הוא Cookie מסוג HttpOnly. נתוני העסק, הבעיות והמשימות משותפים עם הצוות שלך.",
+    "هذا حساب حقيقي على خادم DriftX: تُتحقّق كلمة المرور في الخادم والجلسة كوكي HttpOnly. وبيانات عملك ومشكلاتك ومهامك مشتركة مع فريقك."
+  ],
+  "auth.badCreds": ["Wrong email or password.", "אימייל או סיסמה שגויים.", "البريد أو كلمة المرور غير صحيحة."],
+  "auth.throttled": ["Too many attempts. Wait 15 minutes.", "יותר מדי ניסיונות. המתן 15 דקות.", "محاولات كثيرة. انتظر 15 دقيقة."],
+  "se.serverConns": ["Live platform connections", "חיבורי פלטפורמה חיים", "اتصالات المنصّات المباشرة"],
+  "se.connectGoogle": ["Authorise Google Ads", "אשר הרשאה ל-Google Ads", "منح صلاحية Google Ads"],
+  "se.serverMode": ["Server mode — Plesk + MySQL", "מצב שרת — Plesk + MySQL", "وضع الخادم — Plesk + MySQL"],
+  "se.localMode": ["Browser mode — no server", "מצב דפדפן — בלי שרת", "وضع المتصفح — بلا خادم"],
   "auth.localOnly": [
     "This build runs entirely in your browser. Your email is stored locally to name the session — the password field is not read, not stored and not sent anywhere.",
     "הגרסה הזו רצה כולה בדפדפן שלך. האימייל נשמר מקומית כדי לזהות את הסשן — שדה הסיסמה לא נקרא, לא נשמר ולא נשלח לשום מקום.",
@@ -203,6 +214,41 @@ window.MKT_STR = {
 };
 Object.assign(window.MKT_STR, {
   /* ---------- empty states ---------- */
+  /* ---------- server / live mode ---------- */
+  "live.badge": ["Live data", "נתונים חיים", "بيانات مباشرة"],
+  "live.banner": [
+    "Live from your ad accounts — {n} campaigns, last sync {t}. The platforms report spend, delivery and a lead count; anything after the lead needs a CRM.",
+    "נתונים חיים מחשבונות הפרסום — {n} קמפיינים, סנכרון אחרון {t}. הפלטפורמות מדווחות הוצאה, תפוצה ומספר לידים; כל מה שאחרי הליד דורש CRM.",
+    "بيانات مباشرة من حساباتك الإعلانية — {n} حملة، آخر مزامنة {t}. المنصّات تُبلّغ عن الإنفاق والتوصيل وعدد العملاء؛ وكل ما بعد العميل يحتاج CRM."
+  ],
+  "live.syncNow": ["Sync now", "סנכרן עכשיו", "زامن الآن"],
+  "live.syncing": ["Syncing…", "מסנכרן…", "جارٍ المزامنة…"],
+  "live.syncDone": ["Sync finished: {n} rows written.", "הסנכרון הסתיים: {n} רשומות נכתבו.", "انتهت المزامنة: {n} سجلاً كُتبت."],
+  "live.syncFail": ["Sync failed: {e}", "הסנכרון נכשל: {e}", "فشلت المزامنة: {e}"],
+  "live.mixedCurrency": [
+    "Accounts report in different currencies ({c}); amounts are shown per account and not converted.",
+    "החשבונות מדווחים במטבעות שונים ({c}); הסכומים מוצגים לפי חשבון ואינם מומרים.",
+    "الحسابات تُبلّغ بعملات مختلفة ({c})؛ تُعرض المبالغ لكل حساب دون تحويل."
+  ],
+  "src.needTitle": ["This screen needs a lead-level source", "המסך הזה דורש מקור ברמת הליד", "هذه الشاشة تحتاج مصدراً على مستوى العميل"],
+  "src.needBody": [
+    "Google Ads and Meta report campaign performance, not individual leads. Response time, follow-up, qualification, close rate, revenue and the platform-to-CRM gap all need a CRM or a lead-forms connection.",
+    "Google Ads ו-Meta מדווחים על ביצועי קמפיינים, לא על לידים בודדים. זמן תגובה, Follow-up, הכשרה, אחוז סגירה, הכנסה ופער הפלטפורמה מול ה-CRM — כולם דורשים חיבור CRM או טפסי לידים.",
+    "جوجل وميتا تُبلّغان عن أداء الحملات لا عن العملاء فرداً فرداً. زمن الاستجابة والمتابعة والتأهيل ونسبة الإغلاق والإيراد وفجوة المنصّة مقابل CRM — كلها تحتاج ربط CRM أو نماذج العملاء."
+  ],
+  "src.needCta": ["What ads data does cover", "מה כן מכוסה מנתוני הפרסום", "ما تغطّيه بيانات الإعلانات"],
+  "src.adsCovers": [
+    "Spend, impressions, clicks, CTR, CPC, frequency, platform-reported leads, cost per lead, creative fatigue and budget-capped campaigns.",
+    "הוצאה, חשיפות, קליקים, CTR, CPC, Frequency, לידים לפי הפלטפורמה, עלות לליד, עייפות קריאייטיב וקמפיינים מוגבלי תקציב.",
+    "الإنفاق والظهور والنقرات وCTR وCPC والتكرار والعملاء بحسب المنصّة وتكلفة العميل وإجهاد الإبداع والحملات المقيّدة بالميزانية."
+  ],
+  "src.noOverall": [
+    "An overall business score needs sales data. With ad platforms alone the system scores marketing delivery only, and says so rather than filling the gap with an estimate.",
+    "ציון עסקי כולל דורש נתוני מכירות. עם פלטפורמות הפרסום בלבד המערכת מנקדת רק את ביצועי המדיה, ואומרת זאת במקום להשלים את הפער באומדן.",
+    "النتيجة التجارية الكلية تحتاج بيانات مبيعات. وبمنصّات الإعلان وحدها يقيّم النظام أداء الوسائط فقط، ويقول ذلك بدل ملء الفجوة بتقدير."
+  ],
+  "src.adsScore": ["Media delivery score", "ציון ביצועי מדיה", "درجة أداء الوسائط"],
+
   "empty.title": ["No data yet", "עדיין אין נתונים", "لا بيانات بعد"],
   "empty.body": [
     "Connect your advertising platform or your CRM to start the diagnosis.",
@@ -859,6 +905,11 @@ window.MKT_DX = {
   createTasks: ["Turn these into tasks", "הפוך למשימות", "حوّلها إلى مهام"],
   tasksMade: ["{n} tasks added to the action plan", "{n} משימות נוספו לתוכנית הפעולה", "أُضيفت {n} مهمة إلى خطة العمل"],
   noData: ["There is not enough connected data to answer that yet.", "אין מספיק נתונים מחוברים כדי לענות על זה.", "لا توجد بيانات موصولة كافية للإجابة بعد."],
+  needLeads: [
+    "That question cannot be answered from ad-platform data alone — it is about what happened after the lead arrived. Connect a CRM or a lead-forms source and ask again.",
+    "לא ניתן לענות על השאלה מנתוני פלטפורמות הפרסום בלבד — היא עוסקת במה שקרה אחרי שהליד נכנס. חבר CRM או מקור טפסי לידים ושאל שוב.",
+    "لا يمكن الإجابة عن هذا السؤال من بيانات منصّات الإعلان وحدها — فهو عمّا حدث بعد وصول العميل. اربط CRM أو مصدر نماذج ثم اسأل مجدداً."
+  ],
   external: ["External conditions", "תנאים חיצוניים", "ظروف خارجية"]
 };
 

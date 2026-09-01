@@ -5,6 +5,7 @@
   var H = V._;
   var $ = H.$, $$ = H.$$, esc = H.esc;
   var ROOT = document.getElementById("mkRoot");
+  var SERVER = false;         /* true when /api is reachable and set up */
   var multiState = {};        /* onboarding multi-selects */
   var obStep = 0;
 
@@ -72,8 +73,10 @@
       '<div class="mk-or"><span>' + window.T("auth.or") + '</span></div>' +
       '<button type="button" class="mk-btn" style="justify-content:center" data-act="need-backend">' + window.T("auth.google") + '</button>' +
       '<button type="button" class="mk-btn" style="justify-content:center" data-act="need-backend">' + window.T("auth.2fa") + '</button>' +
-      '<p class="mk-note">' + window.T("auth.needBackend") + '</p>' +
-      '<p class="mk-note">' + window.T("auth.localOnly") + '</p>' +
+      (SERVER
+        ? '<p class="mk-note">' + window.T("auth.serverNote") + '</p>'
+        : '<p class="mk-note">' + window.T("auth.needBackend") + '</p>' +
+          '<p class="mk-note">' + window.T("auth.localOnly") + '</p>') +
       '<div class="rowb"><div class="mk-lang">' + langButtons() + '</div>' +
       '<a class="mk-btn mk-btn--ghost mk-btn--sm" href="../">' + window.T("auth.backSite") + '</a></div>' +
       '</form></div></div>';
@@ -148,13 +151,26 @@
 
     var ds = D.dataset();
     var banner = "";
-    if (D.mode() === "demo" && ds) {
+    if (D.mode() === "live" && ds) {
+      var rem = D.remote();
+      var last = "—";
+      if (rem && rem.connections) {
+        Object.keys(rem.connections).forEach(function (k) {
+          var c = rem.connections[k];
+          if (c && c.lastSync) last = H.fmtDT(Date.parse(String(c.lastSync).replace(" ", "T") + "Z"));
+        });
+      }
+      banner = '<div class="mk-banner" style="border-color:rgba(163,230,53,.34);background:rgba(163,230,53,.08)">' +
+        '<span>●</span><p><b>' + window.T("live.badge") + '.</b> ' +
+        esc(window.T("live.banner", { n: ds.camps.length, t: last })) + '</p>' +
+        '<button class="mk-btn mk-btn--sm" data-act="sync-now" data-provider="all">' + window.T("live.syncNow") + '</button></div>';
+    } else if (D.mode() === "demo" && ds) {
       banner = '<div class="mk-banner"><span>◐</span><p><b>' + window.T("l.demoData") + '.</b> ' +
         esc(window.T("demo.banner", { n: D.num(ds.leads.length), c: ds.camps.length })) + '</p>' +
         '<button class="mk-btn mk-btn--sm" data-act="demo-off">' + window.T("demo.turnOff") + '</button></div>';
     }
 
-    var filters = D.mode() === "demo" ? (function () {
+    var filters = (D.mode() === "demo" || D.mode() === "live") ? (function () {
       var countries = [];
       ds.camps.forEach(function (c) { if (countries.indexOf(c.country) < 0) countries.push(c.country); });
       return '<select class="mk-sel" style="width:auto" data-f="range">' +
@@ -309,9 +325,31 @@
     if (!act) return;
     if (act === "need-backend") { alert(window.T("auth.needBackend")); return; }
     if (act === "theme") { applyTheme(D.state().theme === "light" ? "dark" : "light"); render(); return; }
-    if (act === "logout") { D.set({ user: null }); render(); return; }
+    if (act === "logout") {
+      if (SERVER && window.MKT_REMOTE) window.MKT_REMOTE.logout();
+      D.set({ user: null }); render(); return;
+    }
+    if (act === "sync-now") {
+      var prov = b.getAttribute("data-provider") || "all";
+      b.disabled = true; b.textContent = window.T("live.syncing");
+      window.MKT_REMOTE.sync(prov).then(function (r) {
+        var written = 0, failed = null;
+        (r.reports || []).forEach(function (x) {
+          written += (x.rows_written || 0);
+          if (x.ok === false && x.error) failed = x.provider + ": " + x.error;
+        });
+        if (failed) alert(window.T("live.syncFail", { e: failed }));
+        else alert(window.T("live.syncDone", { n: written }));
+        return refreshData();
+      }).catch(function () {}).then(render);
+      return;
+    }
     if (act === "side") { var sd = $("#mkSide"); if (sd) sd.classList.toggle("open"); return; }
-    if (act === "rerun") { D.invalidate(); render(); return; }
+    if (act === "rerun") {
+      D.invalidate();
+      if (SERVER) { refreshData().catch(function () {}).then(render); return; }
+      render(); return;
+    }
     if (act === "print") { window.print(); return; }
     if (act === "demo-on") { D.set({ demo: true }); D.invalidate(); render(); return; }
     if (act === "demo-off") { D.set({ demo: false }); D.invalidate(); render(); return; }
@@ -399,10 +437,25 @@
   document.addEventListener("submit", function (ev) {
     if (!ev.target || ev.target.id !== "authForm") return;
     ev.preventDefault();
-    var email = ($("#au_email") || {}).value || "";
-    if (!email.trim()) { alert(window.T("auth.emailReq")); return; }
-    /* the password field is intentionally never read or stored */
-    D.set({ user: { email: email.trim(), name: email.trim().split("@")[0] } });
+    var email = (($("#au_email") || {}).value || "").trim();
+    var pass = ($("#au_pass") || {}).value || "";
+    if (!email) { alert(window.T("auth.emailReq")); return; }
+
+    if (SERVER) {
+      /* real credentials, verified on the server */
+      window.MKT_REMOTE.login(email, pass).then(function (r) {
+        if (!r.ok) {
+          alert(r.error === "too_many_attempts" ? window.T("auth.throttled") : window.T("auth.badCreds"));
+          return;
+        }
+        D.set({ user: { email: r.user.email, name: r.user.name || email.split("@")[0] } });
+        obStep = 0;
+        adoptServerState().then(refreshData).catch(function () {}).then(render);
+      });
+      return;
+    }
+    /* browser mode: the password field is never read or stored */
+    D.set({ user: { email: email, name: email.split("@")[0] } });
     obStep = 0;
     render();
   });
@@ -416,10 +469,39 @@
     var s = D.state();
     if (f === "range") s.range = parseInt(el.value, 10) || 30;
     else { s.filters[f] = el.value; }
-    D.save(); render();
+    D.save();
+    if (SERVER && f === "range") { refreshData().catch(function () {}).then(render); return; }
+    render();
   });
 
+  /* ---------------- boot: server mode when /api answers ---------------- */
+  function refreshData() {
+    if (!SERVER) return Promise.resolve();
+    return window.MKT_REMOTE.loadData(D.state().range || 30).then(function (p) {
+      D.setRemote(p && p.ok && p.campaigns && p.campaigns.length ? p : null);
+    });
+  }
+  function adoptServerState() {
+    return window.MKT_REMOTE.loadState().then(function (st) {
+      if (!st || typeof st !== "object") return;
+      var local = D.state();
+      Object.keys(st).forEach(function (k) { if (k !== "user") local[k] = st[k]; });
+    });
+  }
+  function boot() {
+    initLang();
+    if (!window.MKT_REMOTE) { render(); return; }
+    window.MKT_REMOTE.probe().then(function () {
+      SERVER = window.MKT_REMOTE.serverMode();
+      if (!SERVER) { render(); return null; }
+      return window.MKT_REMOTE.me().then(function (u) {
+        if (!u) { D.set({ user: null }); return null; }
+        D.set({ user: { email: u.email, name: u.name || String(u.email).split("@")[0] } });
+        return adoptServerState().then(refreshData);
+      });
+    }).catch(function () {}).then(function () { render(); });
+  }
+
   window.addEventListener("hashchange", render);
-  initLang();
-  render();
+  boot();
 })();

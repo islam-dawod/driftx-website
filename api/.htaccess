@@ -1,0 +1,22 @@
+# DriftX AI Marketing API
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /api/
+  # setup and cron are real files
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^ - [L]
+  # everything else goes through the router
+  RewriteRule ^ index.php [L]
+</IfModule>
+
+# never serve the config or the schema, even if PHP is disabled
+<FilesMatch "^(config\.php|config\.sample\.php|schema\.sql)$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+
+Options -Indexes
