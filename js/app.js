@@ -150,17 +150,34 @@
   if (form) form.addEventListener("submit", (e) => {
     e.preventDefault();
     const note = $("#formNote");
+    const dict = (window.DRIFTX_I18N && window.DRIFTX_I18N[document.documentElement.lang]) || {};
+    const msg = (k, fb) => dict[k] || fb;
     const email = form.email.value.trim(), name = form.name.value.trim();
-    if (!name || !email) { note.textContent = "Please add your name and email."; note.style.color = "var(--coral)"; return; }
-    // Static site: no backend yet — hand off to email. (Wire to a real endpoint later.)
-    const focus = $$(".chip.active", chips).map((c) => c.textContent).join(", ");
-    const subject = encodeURIComponent("DriftX enquiry — " + (form.company.value || name));
-    const body = encodeURIComponent(
-      `Name: ${name}\nCompany: ${form.company.value}\nEmail: ${email}\nPhone: ${form.phone.value}\n` +
-      `Business: ${form.does.value}\nChallenge: ${form.challenge.value}\nFocus: ${focus}`
-    );
-    note.textContent = "Opening your email app…"; note.style.color = "var(--lime)";
-    window.location.href = `mailto:hello@driftx.co?subject=${subject}&body=${body}`;
+    if (!name || !email) { note.textContent = msg("contact.fill", "Please add your name and email."); note.style.color = "var(--coral)"; return; }
+    const focus = $$(".chip.active", chips).map((c) => c.textContent.trim()).join(", ");
+    const fd = new FormData(form);
+    fd.set("focus", focus);
+    fd.set("lang", document.documentElement.lang || "en");
+    const submitBtn = form.querySelector("[type=submit]");
+    note.textContent = msg("contact.sending", "Sending…"); note.style.color = "var(--ink-3)";
+    if (submitBtn) submitBtn.disabled = true;
+    fetch("contact.php", { method: "POST", body: fd })
+      .then((r) => r.ok ? r.json() : Promise.reject(r.status))
+      .then((d) => {
+        if (!d || !d.ok) throw new Error("send");
+        note.textContent = msg("contact.thanks", "Thanks — we'll get back to you within one business day.");
+        note.style.color = "var(--lime)";
+        form.reset();
+        $$(".chip.active", chips).forEach((c) => c.classList.remove("active"));
+      })
+      .catch(() => {
+        // Fallback: hand off to the visitor's mail app.
+        const subject = encodeURIComponent("DriftX enquiry — " + name);
+        const body = encodeURIComponent("Name: " + name + "\nEmail: " + email + "\nFocus: " + focus + "\n\nChallenge:\n" + form.challenge.value);
+        note.textContent = msg("contact.mailapp", "Opening your email app…"); note.style.color = "var(--brand-soft)";
+        window.location.href = "mailto:info@driftx.co?subject=" + subject + "&body=" + body;
+      })
+      .finally(() => { if (submitBtn) submitBtn.disabled = false; });
   });
 
   /* ================= AI BUSINESS SCAN ================= */
