@@ -16,3 +16,7 @@ api/config.php
 
 # Never commit real backend secrets to this (public) repo
 api/config.php
+
+# contact form mail secrets / logs
+contact-config.php
+contact-error.log
