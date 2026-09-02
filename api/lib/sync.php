@@ -2,14 +2,15 @@
 /** DRIFTX AI Marketing — sync orchestration and upserts. */
 declare(strict_types=1);
 
-function dx_upsert_account(string $provider, array $acc): int {
+function dx_upsert_account(string $provider, array $acc, ?int $projectId = null): int {
   dx_q(
-    'INSERT INTO ad_accounts (provider, external_id, name, currency, country, enabled, updated_at)
-     VALUES (?, ?, ?, ?, ?, 1, ?)
+    'INSERT INTO ad_accounts (provider, external_id, name, currency, country, project_id, enabled, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, 1, ?)
      ON DUPLICATE KEY UPDATE name = VALUES(name), currency = VALUES(currency),
-       country = IF(VALUES(country) = \'\', country, VALUES(country)), updated_at = VALUES(updated_at)',
+       country = IF(VALUES(country) = \'\', country, VALUES(country)),
+       project_id = IFNULL(VALUES(project_id), project_id), updated_at = VALUES(updated_at)',
     [$provider, (string) $acc['external_id'], (string) ($acc['name'] ?? ''), (string) ($acc['currency'] ?? ''),
-     (string) ($acc['country'] ?? ''), dx_now()]
+     (string) ($acc['country'] ?? ''), $projectId, dx_now()]
   );
   $r = dx_one('SELECT id FROM ad_accounts WHERE provider = ? AND external_id = ?', [$provider, (string) $acc['external_id']]);
   return (int) ($r['id'] ?? 0);
@@ -45,12 +46,20 @@ function dx_upsert_daily(int $campaignId, array $d): void {
   );
 }
 
-function dx_sync_window(string $provider): array {
-  $r = dx_one(
-    'SELECT MAX(cd.day) AS last_day FROM campaign_daily cd
-     JOIN campaigns c ON c.id = cd.campaign_id WHERE c.provider = ?',
-    [$provider]
-  );
+function dx_sync_window(string $provider, ?int $projectId = null): array {
+  $r = $projectId
+    ? dx_one(
+        'SELECT MAX(cd.day) AS last_day FROM campaign_daily cd
+         JOIN campaigns c ON c.id = cd.campaign_id
+         JOIN ad_accounts a ON a.id = c.account_id
+         WHERE c.provider = ? AND a.project_id = ?',
+        [$provider, $projectId]
+      )
+    : dx_one(
+        'SELECT MAX(cd.day) AS last_day FROM campaign_daily cd
+         JOIN campaigns c ON c.id = cd.campaign_id WHERE c.provider = ?',
+        [$provider]
+      );
   $lookback = max(1, (int) dx_cfg('sync.lookback_days', 14));
   $backfill = max(7, (int) dx_cfg('sync.backfill_days', 90));
   $until = gmdate('Y-m-d');
@@ -63,21 +72,25 @@ function dx_sync_window(string $provider): array {
 }
 
 /** Runs one provider end to end. Returns a report array. */
-function dx_sync_provider(string $provider): array {
+function dx_sync_provider(string $provider, ?int $projectId = null): array {
   $stats = ['calls' => 0];
   $logId = dx_log_sync_start($provider);
-  [$since, $until] = dx_sync_window($provider);
+  if ($projectId) dx_q('UPDATE sync_log SET project_id = ? WHERE id = ?', [$projectId, $logId]);
+  [$since, $until] = dx_sync_window($provider, $projectId);
+  $project = $projectId ? dx_project($projectId) : null;
+  $label = $project ? (string) $project['name'] : 'all';
   $read = 0; $written = 0;
 
   try {
     if ($provider === 'meta') {
       if (!dx_cfg('meta.enabled', false)) throw new RuntimeException('meta_disabled_in_config');
-      $accounts = dx_cfg('meta.ad_accounts', []);
-      if (!is_array($accounts) || !count($accounts)) throw new RuntimeException('meta_no_ad_accounts_configured');
+      /* a project lists its own ad accounts; the config list is the fallback */
+      $accounts = $projectId ? dx_project_meta_accounts($projectId) : (array) dx_cfg('meta.ad_accounts', []);
+      if (!is_array($accounts) || !count($accounts)) throw new RuntimeException('meta_no_ad_accounts_for_project');
       foreach ($accounts as $acc) {
         $pull = dx_meta_pull_account((array) $acc, $since, $until, $stats);
         if (!$pull['ok']) throw new RuntimeException((string) $pull['error']);
-        $accountId = dx_upsert_account('meta', $pull['account']);
+        $accountId = dx_upsert_account('meta', $pull['account'], $projectId);
         $map = [];
         foreach ($pull['campaigns'] as $c) $map[(string) $c['external_id']] = dx_upsert_campaign($accountId, 'meta', $c);
         foreach ($pull['daily'] as $d) {
@@ -88,9 +101,11 @@ function dx_sync_provider(string $provider): array {
       }
     } elseif ($provider === 'google') {
       if (!dx_cfg('google.enabled', false)) throw new RuntimeException('google_disabled_in_config');
-      $pull = dx_google_pull($since, $until, $stats);
+      $g = $projectId ? dx_project_google($projectId) : ['customer' => '', 'login' => ''];
+      if ($projectId && $g['customer'] === '') throw new RuntimeException('google_customer_id_missing_for_project');
+      $pull = dx_google_pull($since, $until, $stats, $g['customer'] ?: null, $g['login'] ?: null);
       if (!$pull['ok']) throw new RuntimeException((string) $pull['error']);
-      $accountId = dx_upsert_account('google', $pull['account']);
+      $accountId = dx_upsert_account('google', $pull['account'], $projectId);
       $map = [];
       foreach ($pull['campaigns'] as $c) $map[(string) $c['external_id']] = dx_upsert_campaign($accountId, 'google', $c);
       foreach ($pull['daily'] as $d) {
@@ -104,36 +119,81 @@ function dx_sync_provider(string $provider): array {
 
     dx_conn_set($provider, ['status' => 'on', 'last_sync_at' => dx_now(), 'last_error' => null]);
     dx_log_sync_end($logId, true, $stats['calls'], $read, $written, null);
-    return ['ok' => true, 'provider' => $provider, 'since' => $since, 'until' => $until,
+    return ['ok' => true, 'provider' => $provider, 'project' => $label, 'projectId' => $projectId,
+      'since' => $since, 'until' => $until,
       'calls' => $stats['calls'], 'rows_read' => $read, 'rows_written' => $written];
   } catch (Throwable $e) {
     $msg = $e->getMessage();
     dx_conn_set($provider, ['status' => 'err', 'last_error' => $msg]);
     dx_log_sync_end($logId, false, $stats['calls'], $read, $written, $msg);
-    return ['ok' => false, 'provider' => $provider, 'error' => $msg, 'calls' => $stats['calls'],
-      'rows_read' => $read, 'rows_written' => $written];
+    return ['ok' => false, 'provider' => $provider, 'project' => $label, 'projectId' => $projectId,
+      'error' => $msg, 'calls' => $stats['calls'], 'rows_read' => $read, 'rows_written' => $written];
   }
 }
 
+/** Syncs every enabled project, or the config accounts when no project exists yet. */
+function dx_sync_all(?string $onlyProvider = null, ?int $onlyProject = null): array {
+  $providers = ($onlyProvider && $onlyProvider !== 'all') ? [$onlyProvider] : ['meta', 'google'];
+  $projects = dx_projects(true);
+  if ($onlyProject) {
+    $projects = array_values(array_filter($projects, function ($p) use ($onlyProject) {
+      return (int) $p['id'] === $onlyProject;
+    }));
+  }
+  $reports = [];
+  if (!count($projects)) {
+    foreach ($providers as $p) {
+      if (!dx_cfg($p . '.enabled', false)) { $reports[] = ['ok' => false, 'provider' => $p, 'error' => 'disabled_in_config']; continue; }
+      $reports[] = dx_sync_provider($p, null);
+    }
+    return $reports;
+  }
+  foreach ($projects as $proj) {
+    $pid = (int) $proj['id'];
+    foreach ($providers as $p) {
+      if (!dx_cfg($p . '.enabled', false)) {
+        $reports[] = ['ok' => false, 'provider' => $p, 'project' => $proj['name'], 'error' => 'disabled_in_config'];
+        continue;
+      }
+      if ($p === 'meta' && !count(dx_project_meta_accounts($pid))) continue;
+      if ($p === 'google' && dx_project_google($pid)['customer'] === '') continue;
+      $reports[] = dx_sync_provider($p, $pid);
+    }
+  }
+  return $reports;
+}
+
 /** Campaign rows + daily series for the UI. */
-function dx_data_payload(int $range): array {
+function dx_data_payload(int $range, ?int $projectId = null): array {
   $range = max(1, min(365, $range));
   $since = gmdate('Y-m-d', time() - ($range - 1) * 86400);
   $prevSince = gmdate('Y-m-d', time() - (2 * $range - 1) * 86400);
 
-  $accounts = dx_all('SELECT id, provider, external_id, name, currency, country FROM ad_accounts WHERE enabled = 1');
-  $camps = dx_all(
-    'SELECT c.id, c.provider, c.external_id, c.name, c.status, c.objective, c.channel, c.daily_budget,
+  $accounts = $projectId
+    ? dx_all('SELECT id, provider, external_id, name, currency, country FROM ad_accounts WHERE enabled = 1 AND project_id = ?', [$projectId])
+    : dx_all('SELECT id, provider, external_id, name, currency, country FROM ad_accounts WHERE enabled = 1');
+  $sqlCamps = 'SELECT c.id, c.provider, c.external_id, c.name, c.status, c.objective, c.channel, c.daily_budget,
             c.budget_capped, c.account_id, a.currency, a.country, a.name AS account_name
-     FROM campaigns c JOIN ad_accounts a ON a.id = c.account_id
-     ORDER BY c.provider, c.name'
-  );
-  $days = dx_all(
-    'SELECT cd.campaign_id, cd.day, cd.spend, cd.impressions, cd.clicks, cd.conversions, cd.leads,
-            cd.reach, cd.frequency, cd.currency
-     FROM campaign_daily cd WHERE cd.day >= ? ORDER BY cd.day',
-    [$prevSince]
-  );
+     FROM campaigns c JOIN ad_accounts a ON a.id = c.account_id';
+  $camps = $projectId
+    ? dx_all($sqlCamps . ' WHERE a.project_id = ? ORDER BY c.provider, c.name', [$projectId])
+    : dx_all($sqlCamps . ' ORDER BY c.provider, c.name');
+  $days = $projectId
+    ? dx_all(
+        'SELECT cd.campaign_id, cd.day, cd.spend, cd.impressions, cd.clicks, cd.conversions, cd.leads,
+                cd.reach, cd.frequency, cd.currency
+         FROM campaign_daily cd
+         JOIN campaigns c ON c.id = cd.campaign_id
+         JOIN ad_accounts a ON a.id = c.account_id
+         WHERE cd.day >= ? AND a.project_id = ? ORDER BY cd.day',
+        [$prevSince, $projectId]
+      )
+    : dx_all(
+        'SELECT cd.campaign_id, cd.day, cd.spend, cd.impressions, cd.clicks, cd.conversions, cd.leads,
+                cd.reach, cd.frequency, cd.currency
+         FROM campaign_daily cd WHERE cd.day >= ? ORDER BY cd.day',
+        [$prevSince]
+      );
   $byCamp = [];
   foreach ($days as $d) {
     $cid = (int) $d['campaign_id'];
@@ -180,12 +240,18 @@ function dx_data_payload(int $range): array {
       'configured' => (bool) dx_cfg($p . '.enabled', false),
     ];
   }
-  $syncs = dx_all('SELECT provider, started_at, finished_at, ok, rows_written, error FROM sync_log ORDER BY id DESC LIMIT 8');
+  $syncs = $projectId
+    ? dx_all('SELECT provider, started_at, finished_at, ok, rows_written, error FROM sync_log WHERE project_id = ? ORDER BY id DESC LIMIT 8', [$projectId])
+    : dx_all('SELECT provider, started_at, finished_at, ok, rows_written, error FROM sync_log ORDER BY id DESC LIMIT 8');
 
+  $project = $projectId ? dx_project($projectId) : null;
   return [
     'ok' => true,
     'range' => $range,
     'since' => $since,
+    'projectId' => $projectId,
+    'projectName' => $project ? (string) $project['name'] : null,
+    'projectCurrency' => $project ? $project['currency'] : null,
     'capabilities' => [
       'ads' => count($out) > 0,
       'leads' => false,     /* no lead-level source connected */

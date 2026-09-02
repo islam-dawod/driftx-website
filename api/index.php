@@ -6,6 +6,7 @@ require __DIR__ . '/lib/boot.php';
 require __DIR__ . '/lib/auth.php';
 require __DIR__ . '/lib/meta.php';
 require __DIR__ . '/lib/google.php';
+require __DIR__ . '/lib/projects.php';
 require __DIR__ . '/lib/sync.php';
 
 /* ---------------- routing ---------------- */
@@ -39,6 +40,7 @@ if ($route === 'health') {
     'tables' => false,
     'users' => 0,
     'setup_enabled' => (bool) dx_cfg('app.setup_enabled', false),
+    'projects' => 0,
     'providers' => [
       'meta' => ['configured' => (bool) dx_cfg('meta.enabled', false), 'accounts' => count((array) dx_cfg('meta.ad_accounts', []))],
       'google' => ['configured' => (bool) dx_cfg('google.enabled', false), 'customer' => dx_cfg('google.customer_id', '') !== ''],
@@ -54,6 +56,13 @@ if ($route === 'health') {
         $u = dx_one('SELECT COUNT(*) AS n FROM users');
         $out['users'] = (int) ($u['n'] ?? 0);
         $out['authenticated'] = dx_session_user() !== null;
+        $pr = dx_one("SELECT COUNT(*) AS n FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'projects'");
+        if ((int) ($pr['n'] ?? 0) > 0) {
+          $pc = dx_one('SELECT COUNT(*) AS n FROM projects WHERE enabled = 1');
+          $out['projects'] = (int) ($pc['n'] ?? 0);
+        } else {
+          $out['migration_needed'] = true;
+        }
       }
     } catch (Throwable $e) {
       $out['db_error'] = $e->getMessage();
@@ -65,6 +74,16 @@ if ($route === 'health') {
 /* everything past this point needs a working database */
 if (!dx_configured()) dx_fail('not_configured', 503, ['hint' => 'copy api/config.sample.php to api/config.php on the server']);
 try { dx_db(); } catch (Throwable $e) { dx_fail('db_unavailable', 503, ['detail' => $e->getMessage()]); }
+
+/* which project the request is about: explicit, else the first enabled one */
+function dx_req_project(): ?int {
+  $q = $_GET['project'] ?? null;
+  if ($q !== null && $q !== '' && ctype_digit((string) $q)) {
+    $p = dx_project((int) $q);
+    if ($p) return (int) $p['id'];
+  }
+  return dx_default_project_id();
+}
 
 /* ---------------- auth ---------------- */
 if ($route === 'auth/login' && $method === 'POST') {
@@ -83,21 +102,26 @@ if ($route === 'auth/me') {
 /* ---------------- shared application state ---------------- */
 if ($route === 'state' && $method === 'GET') {
   dx_require_user();
-  dx_json(['ok' => true, 'state' => dx_state_get('app', new stdClass())]);
+  $pid = dx_req_project();
+  dx_json(['ok' => true, 'projectId' => $pid, 'state' => dx_state_get(dx_state_key($pid), new stdClass())]);
 }
 if ($route === 'state' && ($method === 'PUT' || $method === 'POST')) {
   $u = dx_require_user();
   $b = dx_body();
   if (!isset($b['state']) || !is_array($b['state'])) dx_fail('state_required');
-  dx_state_set('app', $b['state'], (int) $u['id']);
-  dx_json(['ok' => true, 'savedAt' => dx_now()]);
+  $pid = dx_req_project();
+  dx_state_set(dx_state_key($pid), $b['state'], (int) $u['id']);
+  dx_json(['ok' => true, 'projectId' => $pid, 'savedAt' => dx_now()]);
 }
 
 /* ---------------- data ---------------- */
 if ($route === 'data') {
   dx_require_user();
   $range = (int) ($_GET['range'] ?? 30);
-  dx_json(dx_data_payload($range));
+  $pid = dx_req_project();
+  $payload = dx_data_payload($range, $pid);
+  $payload['projects'] = dx_projects(false);
+  dx_json($payload);
 }
 if ($route === 'connections') {
   dx_require_user();
@@ -112,18 +136,45 @@ if ($route === 'connections') {
   dx_json(['ok' => true, 'connections' => $out]);
 }
 
+/* ---------------- projects ---------------- */
+if ($route === 'projects' && $method === 'GET') {
+  dx_require_user();
+  dx_json(['ok' => true, 'projects' => dx_projects(false), 'defaultId' => dx_default_project_id()]);
+}
+if ($route === 'projects' && $method === 'POST') {
+  dx_require_user();
+  $r = dx_project_create(dx_body());
+  if (!$r['ok']) dx_fail((string) $r['error']);
+  dx_json(['ok' => true, 'id' => $r['id'], 'projects' => dx_projects(false)]);
+}
+if (preg_match('#^projects/(\d+)$#', $route, $mm) && ($method === 'PUT' || $method === 'POST')) {
+  dx_require_user();
+  $r = dx_project_update((int) $mm[1], dx_body());
+  if (!$r['ok']) dx_fail((string) $r['error'], $r['error'] === 'not_found' ? 404 : 400);
+  dx_json(['ok' => true, 'projects' => dx_projects(false)]);
+}
+if (preg_match('#^projects/(\d+)/accounts$#', $route, $mm) && $method === 'POST') {
+  dx_require_user();
+  $r = dx_project_add_account((int) $mm[1], dx_body());
+  if (!$r['ok']) dx_fail((string) $r['error'], $r['error'] === 'not_found' ? 404 : 400);
+  dx_json(['ok' => true, 'projects' => dx_projects(false)]);
+}
+if (preg_match('#^projects/(\d+)/accounts/(\d+)$#', $route, $mm) && ($method === 'DELETE' || $method === 'POST')) {
+  dx_require_user();
+  $r = dx_project_remove_account((int) $mm[1], (int) $mm[2]);
+  if (!$r['ok']) dx_fail((string) $r['error'], 404);
+  dx_json(['ok' => true, 'projects' => dx_projects(false)]);
+}
+
 /* ---------------- sync ---------------- */
 if ($route === 'sync' && ($method === 'POST' || $method === 'GET')) {
   dx_require_user_or_cron();
   $provider = (string) ($_GET['provider'] ?? 'all');
-  set_time_limit(300);
-  $reports = [];
-  foreach (($provider === 'all' ? ['meta', 'google'] : [$provider]) as $p) {
-    if (!in_array($p, ['meta', 'google'], true)) continue;
-    if (!dx_cfg($p . '.enabled', false)) { $reports[] = ['ok' => false, 'provider' => $p, 'error' => 'disabled_in_config']; continue; }
-    $reports[] = dx_sync_provider($p);
-  }
-  dx_json(['ok' => true, 'reports' => $reports]);
+  if (!in_array($provider, ['all', 'meta', 'google'], true)) dx_fail('bad_provider');
+  $projectParam = $_GET['project'] ?? '';
+  $onlyProject = ($projectParam !== '' && ctype_digit((string) $projectParam)) ? (int) $projectParam : null;
+  set_time_limit(600);
+  dx_json(['ok' => true, 'reports' => dx_sync_all($provider, $onlyProject)]);
 }
 
 /* ---------------- Google OAuth ---------------- */

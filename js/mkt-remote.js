@@ -58,9 +58,66 @@ window.MKT_REMOTE = (function () {
   }
   function logout() { return req("/auth/logout", { method: "POST" }); }
 
+  /* ---------------- projects ---------------- */
+  var projectId = null;
+  var projectList = [];
+  function getProject() {
+    if (projectId) return projectId;
+    try {
+      var v = localStorage.getItem("driftx_project");
+      if (v) { projectId = parseInt(v, 10) || null; }
+    } catch (e) {}
+    return projectId;
+  }
+  function setProject(id) {
+    projectId = id ? parseInt(String(id), 10) : null;
+    try {
+      if (projectId) localStorage.setItem("driftx_project", String(projectId));
+      else localStorage.removeItem("driftx_project");
+    } catch (e) {}
+  }
+  function projects() { return projectList; }
+  function qp(sep) {
+    var p = getProject();
+    return p ? (sep + "project=" + p) : "";
+  }
+  function loadProjects() {
+    return req("/projects").then(function (r) {
+      if (r.json && r.json.ok) {
+        projectList = r.json.projects || [];
+        if (!getProject() && r.json.defaultId) setProject(r.json.defaultId);
+      }
+      return projectList;
+    });
+  }
+  function createProject(body) {
+    return req("/projects", { method: "POST", body: body }).then(function (r) {
+      if (r.json && r.json.projects) projectList = r.json.projects;
+      return r.json || { ok: false, error: "http_" + r.status };
+    });
+  }
+  function updateProject(id, body) {
+    return req("/projects/" + id, { method: "PUT", body: body }).then(function (r) {
+      if (r.json && r.json.projects) projectList = r.json.projects;
+      return r.json || { ok: false, error: "http_" + r.status };
+    });
+  }
+  function addAccount(id, body) {
+    return req("/projects/" + id + "/accounts", { method: "POST", body: body }).then(function (r) {
+      if (r.json && r.json.projects) projectList = r.json.projects;
+      return r.json || { ok: false, error: "http_" + r.status };
+    });
+  }
+  function removeAccount(id, rowId) {
+    return req("/projects/" + id + "/accounts/" + rowId, { method: "DELETE" }).then(function (r) {
+      if (r.json && r.json.projects) projectList = r.json.projects;
+      return r.json || { ok: false, error: "http_" + r.status };
+    });
+  }
+
   /* ---------------- shared state ---------------- */
   function loadState() {
-    return req("/state").then(function (r) {
+    return req("/state" + qp("?")).then(function (r) {
       return (r.json && r.json.ok && r.json.state && typeof r.json.state === "object") ? r.json.state : null;
     });
   }
@@ -70,20 +127,26 @@ window.MKT_REMOTE = (function () {
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = setTimeout(function () {
       saveTimer = null;
-      req("/state", { method: "PUT", body: { state: state } });
+      req("/state" + qp("?"), { method: "PUT", body: { state: state } });
     }, 700);
   }
 
   /* ---------------- data ---------------- */
   function loadData(range) {
-    return req("/data?range=" + (range || 30)).then(function (r) {
+    return req("/data?range=" + (range || 30) + qp("&")).then(function (r) {
       payload = (r.json && r.json.ok) ? r.json : null;
+      if (payload) {
+        if (payload.projects) projectList = payload.projects;
+        if (!getProject() && payload.projectId) setProject(payload.projectId);
+      }
       return payload;
     });
   }
   function data() { return payload; }
-  function sync(provider) {
-    return req("/sync?provider=" + (provider || "all"), { method: "POST" }).then(function (r) {
+  function sync(provider, onlyThisProject) {
+    var url = "/sync?provider=" + (provider || "all");
+    if (onlyThisProject) url += qp("&");
+    return req(url, { method: "POST" }).then(function (r) {
       return r.json || { ok: false, error: "http_" + r.status };
     });
   }
@@ -95,6 +158,8 @@ window.MKT_REMOTE = (function () {
     probe: probe, serverMode: serverMode, serverReachable: serverReachable, serverStatus: serverStatus,
     me: me, login: login, logout: logout,
     loadState: loadState, saveState: saveState,
+    getProject: getProject, setProject: setProject, projects: projects, loadProjects: loadProjects,
+    createProject: createProject, updateProject: updateProject, addAccount: addAccount, removeAccount: removeAccount,
     loadData: loadData, data: data, sync: sync, connections: connections,
     on: on, emit: emit
   };

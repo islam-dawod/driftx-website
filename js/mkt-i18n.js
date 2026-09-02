@@ -215,6 +215,41 @@ window.MKT_STR = {
 Object.assign(window.MKT_STR, {
   /* ---------- empty states ---------- */
   /* ---------- server / live mode ---------- */
+  "pr.switch": ["Project", "פרויקט", "المشروع"],
+  "pr.title": ["Projects & ad accounts", "פרויקטים וחשבונות פרסום", "المشاريع وحسابات الإعلانات"],
+  "pr.sub": [
+    "One project per client or market. Platform credentials are shared; a project only maps to the account ids under them, and gets its own targets, issues and tasks.",
+    "פרויקט אחד לכל לקוח או שוק. ההרשאות לפלטפורמות משותפות; פרויקט רק ממופה למזהי החשבונות שתחתן, ומקבל יעדים, בעיות ומשימות משלו.",
+    "مشروع واحد لكل عميل أو سوق. صلاحيات المنصّات مشتركة؛ والمشروع يُربط فقط بمعرّفات الحسابات تحتها، وله أهدافه ومشكلاته ومهامه."
+  ],
+  "pr.add": ["Add project", "הוספת פרויקט", "إضافة مشروع"],
+  "pr.name": ["Project name", "שם הפרויקט", "اسم المشروع"],
+  "pr.currency": ["Currency", "מטבע", "العملة"],
+  "pr.googleId": ["Google Ads customer ID", "מזהה חשבון Google Ads", "معرّف حساب Google Ads"],
+  "pr.loginId": ["Manager (MCC) ID — optional", "מזהה מנהל (MCC) — אופציונלי", "معرّف المدير (MCC) — اختياري"],
+  "pr.accounts": ["Ad accounts", "חשבונות פרסום", "حسابات الإعلانات"],
+  "pr.addMeta": ["Add Meta ad account ID", "הוספת מזהה חשבון Meta", "أضف معرّف حساب Meta"],
+  "pr.addGoogle": ["Add Google customer ID", "הוספת מזהה חשבון Google", "أضف معرّف حساب Google"],
+  "pr.accName": ["Label", "תיאור", "التسمية"],
+  "pr.country": ["Country", "מדינה", "الدولة"],
+  "pr.remove": ["Remove", "הסרה", "إزالة"],
+  "pr.syncProject": ["Sync this project", "סנכרן את הפרויקט", "زامن هذا المشروع"],
+  "pr.none": ["No projects yet", "אין פרויקטים", "لا مشاريع بعد"],
+  "pr.noneBody": [
+    "Create one project per client, then attach its Google Ads customer ID and its Meta ad account IDs. The sync then runs per project and the dashboard switches between them.",
+    "צור פרויקט אחד לכל לקוח, ואז חבר את מזהה החשבון של Google Ads ואת מזהי חשבונות Meta. הסנכרון ירוץ לפי פרויקט והדשבורד יתחלף ביניהם.",
+    "أنشئ مشروعاً لكل عميل، ثم أرفق معرّف حساب Google Ads ومعرّفات حسابات Meta. تعمل المزامنة لكل مشروع وتتبدّل اللوحة بينها."
+  ],
+  "pr.campaignsN": ["{n} campaigns", "{n} קמפיינים", "{n} حملة"],
+  "pr.lastData": ["Newest data: {t}", "הנתון האחרון: {t}", "أحدث بيانات: {t}"],
+  "pr.created": ["Project created", "הפרויקט נוצר", "أُنشئ المشروع"],
+  "pr.nameReq": ["Enter a project name.", "הזן שם פרויקט.", "أدخل اسم المشروع."],
+  "pr.idReq": ["Enter an account ID (digits only).", "הזן מזהה חשבון (ספרות בלבד).", "أدخل معرّف حساب (أرقام فقط)."],
+  "pr.needsServer": [
+    "Projects live on the server. Finish the Plesk setup (api/README.md) and sign in to manage them.",
+    "הפרויקטים נמצאים בשרת. השלם את ההתקנה ב-Plesk (api/README.md) והתחבר כדי לנהל אותם.",
+    "المشاريع تُدار على الخادم. أكمل الإعداد في Plesk (api/README.md) وسجّل الدخول لإدارتها."
+  ],
   "live.badge": ["Live data", "נתונים חיים", "بيانات مباشرة"],
   "live.banner": [
     "Live from your ad accounts — {n} campaigns, last sync {t}. The platforms report spend, delivery and a lead count; anything after the lead needs a CRM.",

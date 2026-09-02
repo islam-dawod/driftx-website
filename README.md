@@ -63,6 +63,11 @@ real sessions (bcrypt + HttpOnly cookie), state shared across the team in MySQL,
 live campaign data synced from **Google Ads** and **Meta Ads** every 30 minutes.
 When `/api` is absent it falls back to the browser-only mode above, unchanged.
 
+**Multi-project**: one project per client or market, each with its own Google Ads
+customer ID and Meta ad account IDs, its own targets/issues/tasks, and a switcher in
+the top bar. Credentials are shared; only the account mapping is per project. The sync
+and the scheduled task run per project, and data never leaks between them.
+
 Setup, credentials and the scheduled task: see [api/README.md](api/README.md).
 
 Ads platforms report campaign performance, not individual leads — so in server mode

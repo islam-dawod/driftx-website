@@ -5,7 +5,8 @@
   var H = V._;
   var $ = H.$, $$ = H.$$, esc = H.esc;
   var ROOT = document.getElementById("mkRoot");
-  var SERVER = false;         /* true when /api is reachable and set up */
+  /* server mode is read live from the bridge, never cached in a stale flag */
+  function isServer() { return !!(window.MKT_REMOTE && window.MKT_REMOTE.serverMode()); }
   var multiState = {};        /* onboarding multi-selects */
   var obStep = 0;
 
@@ -73,7 +74,7 @@
       '<div class="mk-or"><span>' + window.T("auth.or") + '</span></div>' +
       '<button type="button" class="mk-btn" style="justify-content:center" data-act="need-backend">' + window.T("auth.google") + '</button>' +
       '<button type="button" class="mk-btn" style="justify-content:center" data-act="need-backend">' + window.T("auth.2fa") + '</button>' +
-      (SERVER
+      (isServer()
         ? '<p class="mk-note">' + window.T("auth.serverNote") + '</p>'
         : '<p class="mk-note">' + window.T("auth.needBackend") + '</p>' +
           '<p class="mk-note">' + window.T("auth.localOnly") + '</p>') +
@@ -160,8 +161,10 @@
           if (c && c.lastSync) last = H.fmtDT(Date.parse(String(c.lastSync).replace(" ", "T") + "Z"));
         });
       }
+      var pname = (rem && rem.projectName) ? rem.projectName : "";
       banner = '<div class="mk-banner" style="border-color:rgba(163,230,53,.34);background:rgba(163,230,53,.08)">' +
-        '<span>●</span><p><b>' + window.T("live.badge") + '.</b> ' +
+        '<span>●</span><p><b>' + window.T("live.badge") +
+        (pname ? ' — ' + esc(pname) : '') + '.</b> ' +
         esc(window.T("live.banner", { n: ds.camps.length, t: last })) + '</p>' +
         '<button class="mk-btn mk-btn--sm" data-act="sync-now" data-provider="all">' + window.T("live.syncNow") + '</button></div>';
     } else if (D.mode() === "demo" && ds) {
@@ -183,9 +186,23 @@
         ["google", "meta", "whatsapp", "organic"].map(function (c) { return '<option value="' + c + '"' + (s.filters.source === c ? " selected" : "") + '>' + c + '</option>'; }).join("") + '</select>';
     })() : "";
 
+    var projSel = "";
+    if (isServer() && window.MKT_REMOTE) {
+      var plist = window.MKT_REMOTE.projects() || [];
+      var pcur = window.MKT_REMOTE.getProject();
+      if (plist.length) {
+        projSel = '<select class="mk-sel" style="width:auto" data-f="project" aria-label="' + window.T("pr.switch") + '">' +
+          plist.map(function (p) {
+            return '<option value="' + p.id + '"' + (p.id === pcur ? " selected" : "") + '>' + esc(p.name) + '</option>';
+          }).join("") + '</select>';
+      } else {
+        projSel = '<a class="mk-btn mk-btn--sm" href="#/settings">' + window.T("pr.add") + '</a>';
+      }
+    }
     var top = '<header class="mk-top">' +
       '<button class="mk-burger" data-act="side">☰</button>' +
       '<span class="mk-top__t">' + esc((s.biz && s.biz.name) || window.T("app.name")) + '</span>' +
+      projSel +
       filters +
       '<span class="sp"></span>' +
       '<button class="mk-btn mk-btn--sm" data-act="rerun">' + window.T("top.rerun") + '</button>' +
@@ -326,8 +343,60 @@
     if (act === "need-backend") { alert(window.T("auth.needBackend")); return; }
     if (act === "theme") { applyTheme(D.state().theme === "light" ? "dark" : "light"); render(); return; }
     if (act === "logout") {
-      if (SERVER && window.MKT_REMOTE) window.MKT_REMOTE.logout();
+      if (isServer() && window.MKT_REMOTE) window.MKT_REMOTE.logout();
       D.set({ user: null }); render(); return;
+    }
+    if (act === "pr-use") {
+      window.MKT_REMOTE.setProject(b.getAttribute("data-pid"));
+      D.setRemote(null);
+      adoptServerState().then(refreshData).catch(function () {}).then(render);
+      return;
+    }
+    if (act === "pr-create") {
+      var nm = ($("#pr_name") || {}).value || "";
+      if (!nm.trim()) { alert(window.T("pr.nameReq")); return; }
+      window.MKT_REMOTE.createProject({
+        name: nm.trim(),
+        currency: (($("#pr_currency") || {}).value || "").trim(),
+        googleCustomerId: (($("#pr_gid") || {}).value || "").replace(/[^0-9]/g, ""),
+        googleLoginCustomerId: (($("#pr_lid") || {}).value || "").replace(/[^0-9]/g, "")
+      }).then(function (r) {
+        if (!r.ok) { alert(r.error || "error"); return; }
+        if (!window.MKT_REMOTE.getProject()) window.MKT_REMOTE.setProject(r.id);
+        alert(window.T("pr.created"));
+        render();
+      });
+      return;
+    }
+    if (act === "pr-addacc") {
+      var pid = b.getAttribute("data-pid"), prov = b.getAttribute("data-provider");
+      var fieldEl = $("#pa_" + prov + "_" + pid);
+      var val = (fieldEl && fieldEl.value ? fieldEl.value : "").replace(/[^0-9]/g, "");
+      if (!val) { alert(window.T("pr.idReq")); return; }
+      window.MKT_REMOTE.addAccount(pid, { provider: prov, externalId: val }).then(function (r) {
+        if (!r.ok) { alert(r.error || "error"); return; }
+        render();
+      });
+      return;
+    }
+    if (act === "pr-rmacc") {
+      window.MKT_REMOTE.removeAccount(b.getAttribute("data-pid"), b.getAttribute("data-aid")).then(function () { render(); });
+      return;
+    }
+    if (act === "pr-sync") {
+      window.MKT_REMOTE.setProject(b.getAttribute("data-pid"));
+      b.disabled = true; b.textContent = window.T("live.syncing");
+      window.MKT_REMOTE.sync("all", true).then(function (r) {
+        var written = 0, failed = null;
+        (r.reports || []).forEach(function (x) {
+          written += (x.rows_written || 0);
+          if (x.ok === false && x.error) failed = (x.project ? x.project + " / " : "") + x.provider + ": " + x.error;
+        });
+        if (failed) alert(window.T("live.syncFail", { e: failed }));
+        else alert(window.T("live.syncDone", { n: written }));
+        return window.MKT_REMOTE.loadProjects().then(refreshData);
+      }).catch(function () {}).then(render);
+      return;
     }
     if (act === "sync-now") {
       var prov = b.getAttribute("data-provider") || "all";
@@ -347,7 +416,7 @@
     if (act === "side") { var sd = $("#mkSide"); if (sd) sd.classList.toggle("open"); return; }
     if (act === "rerun") {
       D.invalidate();
-      if (SERVER) { refreshData().catch(function () {}).then(render); return; }
+      if (isServer()) { refreshData().catch(function () {}).then(render); return; }
       render(); return;
     }
     if (act === "print") { window.print(); return; }
@@ -441,7 +510,7 @@
     var pass = ($("#au_pass") || {}).value || "";
     if (!email) { alert(window.T("auth.emailReq")); return; }
 
-    if (SERVER) {
+    if (isServer()) {
       /* real credentials, verified on the server */
       window.MKT_REMOTE.login(email, pass).then(function (r) {
         if (!r.ok) {
@@ -450,7 +519,8 @@
         }
         D.set({ user: { email: r.user.email, name: r.user.name || email.split("@")[0] } });
         obStep = 0;
-        adoptServerState().then(refreshData).catch(function () {}).then(render);
+        window.MKT_REMOTE.loadProjects().then(adoptServerState).then(refreshData)
+          .catch(function () {}).then(render);
       });
       return;
     }
@@ -467,16 +537,23 @@
     var f = el.getAttribute("data-f");
     if (!f) return;
     var s = D.state();
+    if (f === "project") {
+      /* a project switch changes both the data and the shared state behind it */
+      window.MKT_REMOTE.setProject(el.value);
+      D.setRemote(null);
+      adoptServerState().then(refreshData).catch(function () {}).then(render);
+      return;
+    }
     if (f === "range") s.range = parseInt(el.value, 10) || 30;
     else { s.filters[f] = el.value; }
     D.save();
-    if (SERVER && f === "range") { refreshData().catch(function () {}).then(render); return; }
+    if (isServer() && f === "range") { refreshData().catch(function () {}).then(render); return; }
     render();
   });
 
   /* ---------------- boot: server mode when /api answers ---------------- */
   function refreshData() {
-    if (!SERVER) return Promise.resolve();
+    if (!isServer()) return Promise.resolve();
     return window.MKT_REMOTE.loadData(D.state().range || 30).then(function (p) {
       D.setRemote(p && p.ok && p.campaigns && p.campaigns.length ? p : null);
     });
@@ -492,12 +569,11 @@
     initLang();
     if (!window.MKT_REMOTE) { render(); return; }
     window.MKT_REMOTE.probe().then(function () {
-      SERVER = window.MKT_REMOTE.serverMode();
-      if (!SERVER) { render(); return null; }
+      if (!isServer()) { render(); return null; }
       return window.MKT_REMOTE.me().then(function (u) {
         if (!u) { D.set({ user: null }); return null; }
         D.set({ user: { email: u.email, name: u.name || String(u.email).split("@")[0] } });
-        return adoptServerState().then(refreshData);
+        return window.MKT_REMOTE.loadProjects().then(adoptServerState).then(refreshData);
       });
     }).catch(function () {}).then(function () { render(); });
   }

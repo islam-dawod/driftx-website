@@ -126,3 +126,32 @@ CREATE TABLE IF NOT EXISTS snapshots (
   created_at DATETIME NOT NULL,
   PRIMARY KEY (day)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- one project = one client / market, with its own ad accounts and state
+CREATE TABLE IF NOT EXISTS projects (
+  id                       INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name                     VARCHAR(120) NOT NULL,
+  slug                     VARCHAR(64)  NOT NULL,
+  currency                 VARCHAR(8)   DEFAULT NULL,
+  google_customer_id       VARCHAR(32)  DEFAULT NULL,
+  google_login_customer_id VARCHAR(32)  DEFAULT NULL,
+  enabled                  TINYINT(1)   NOT NULL DEFAULT 1,
+  created_at               DATETIME     NOT NULL,
+  updated_at               DATETIME     NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_projects_slug (slug)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS project_accounts (
+  id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id  INT UNSIGNED NOT NULL,
+  provider    VARCHAR(32)  NOT NULL,
+  external_id VARCHAR(64)  NOT NULL,
+  name        VARCHAR(190) DEFAULT NULL,
+  country     VARCHAR(8)   DEFAULT NULL,
+  enabled     TINYINT(1)   NOT NULL DEFAULT 1,
+  created_at  DATETIME     NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_pa (project_id, provider, external_id),
+  KEY k_pa_proj (project_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

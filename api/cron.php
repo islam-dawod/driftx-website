@@ -15,6 +15,7 @@ require __DIR__ . '/lib/boot.php';
 require __DIR__ . '/lib/auth.php';
 require __DIR__ . '/lib/meta.php';
 require __DIR__ . '/lib/google.php';
+require __DIR__ . '/lib/projects.php';
 require __DIR__ . '/lib/sync.php';
 
 $isCli = PHP_SAPI === 'cli';
@@ -31,16 +32,12 @@ if (!$isCli) {
 }
 if (!dx_configured()) { echo "not_configured\n"; exit(1); }
 
-set_time_limit(600);
-$reports = [];
-foreach (['meta', 'google'] as $p) {
-  if (!dx_cfg($p . '.enabled', false)) { $reports[] = ['provider' => $p, 'skipped' => 'disabled']; continue; }
-  $reports[] = dx_sync_provider($p);
-}
+set_time_limit(900);
+$reports = dx_sync_all('all', null);
 
 /* daily snapshot of the headline numbers */
 try {
-  $payload = dx_data_payload(30);
+  $payload = dx_data_payload(30, null);
   $totals = ['spend' => 0.0, 'clicks' => 0, 'impressions' => 0, 'leads' => 0.0];
   $since = $payload['since'];
   foreach ($payload['campaigns'] as $c) {

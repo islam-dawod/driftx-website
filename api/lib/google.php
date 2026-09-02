@@ -79,14 +79,15 @@ function dx_google_access_token(array &$stats): array {
 }
 
 /* ---------------- GAQL ---------------- */
-function dx_google_search(string $query, array &$stats): array {
+function dx_google_search(string $query, array &$stats, ?string $customerId = null, ?string $loginCustomerId = null): array {
   $tok = dx_google_access_token($stats);
   if (!$tok['ok']) return ['ok' => false, 'error' => $tok['error']];
   $dev = (string) dx_cfg('google.developer_token', '');
   if ($dev === '') return ['ok' => false, 'error' => 'google_developer_token_missing'];
-  $cid = dx_digits((string) dx_cfg('google.customer_id', ''));
+  /* a project supplies its own customer id; the config value is the fallback */
+  $cid = dx_digits((string) ($customerId !== null && $customerId !== '' ? $customerId : dx_cfg('google.customer_id', '')));
   if ($cid === '') return ['ok' => false, 'error' => 'google_customer_id_missing'];
-  $login = dx_digits((string) dx_cfg('google.login_customer_id', ''));
+  $login = dx_digits((string) ($loginCustomerId !== null && $loginCustomerId !== '' ? $loginCustomerId : dx_cfg('google.login_customer_id', '')));
 
   $headers = [
     'Authorization: Bearer ' . $tok['token'],
@@ -119,13 +120,13 @@ function dx_google_search(string $query, array &$stats): array {
   return ['ok' => false, 'error' => $lastErr];
 }
 
-function dx_google_pull(string $since, string $until, array &$stats): array {
-  $cid = dx_digits((string) dx_cfg('google.customer_id', ''));
+function dx_google_pull(string $since, string $until, array &$stats, ?string $customerId = null, ?string $loginCustomerId = null): array {
+  $cid = dx_digits((string) ($customerId !== null && $customerId !== '' ? $customerId : dx_cfg('google.customer_id', '')));
 
   /* account currency + name */
   $acc = dx_google_search(
     'SELECT customer.id, customer.descriptive_name, customer.currency_code, customer.time_zone FROM customer LIMIT 1',
-    $stats
+    $stats, $cid, $loginCustomerId
   );
   if (!$acc['ok']) return ['ok' => false, 'error' => $acc['error']];
   $c0 = $acc['rows'][0]['customer'] ?? [];
@@ -143,7 +144,7 @@ function dx_google_pull(string $since, string $until, array &$stats): array {
         FROM campaign
         WHERE segments.date BETWEEN '{$since}' AND '{$until}'
         ORDER BY segments.date";
-  $r = dx_google_search($q, $stats);
+  $r = dx_google_search($q, $stats, $cid, $loginCustomerId);
   if (!$r['ok']) return ['ok' => false, 'error' => $r['error']];
 
   $campaigns = [];

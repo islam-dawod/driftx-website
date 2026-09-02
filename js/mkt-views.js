@@ -1005,17 +1005,75 @@ window.MKT_VIEWS = (function () {
     }
   };
 
+  /* ---------------- projects (server mode) ---------------- */
+  function projectsPanel() {
+    var R = window.MKT_REMOTE;
+    if (!R || !R.serverMode()) {
+      return '<div class="mk-note">' + window.T("pr.needsServer") + '</div>';
+    }
+    var list = R.projects() || [];
+    var cur = R.getProject();
+    var rows = list.length ? list.map(function (p) {
+      var accs = (p.accounts || []);
+      return '<div class="mk-conn ' + (p.id === cur ? "on" : "") + '">' +
+        '<div class="hd"><span class="mk-dot ' + (p.enabled ? "ok" : "off") + '"></span>' +
+        '<span class="nm">' + esc(p.name) + '</span>' +
+        (p.currency ? ' ' + pill(p.currency, "neutral") : '') +
+        '<span class="sp"></span>' +
+        (p.id === cur ? pill(window.T("pr.switch"), "violet")
+          : '<button class="mk-btn mk-btn--sm" data-act="pr-use" data-pid="' + p.id + '">' + window.T("pr.switch") + '</button>') +
+        '</div>' +
+        '<div class="mt">' +
+        '<span>' + window.T("pr.campaignsN", { n: p.campaigns || 0 }) + '</span>' +
+        '<span>' + window.T("pr.lastData", { t: p.lastDay || "—" }) + '</span>' +
+        (p.googleCustomerId ? '<span>Google: ' + esc(p.googleCustomerId) + (p.googleLoginCustomerId ? " (MCC " + esc(p.googleLoginCustomerId) + ")" : "") + '</span>' : '') +
+        '</div>' +
+        '<div style="display:grid;gap:6px">' + (accs.length ? accs.map(function (a2) {
+          return '<div style="display:flex;gap:8px;align-items:center;font-size:12.5px">' +
+            pill(a2.provider === "meta" ? "Meta" : "Google", a2.provider === "meta" ? "info" : "medium") +
+            '<span style="font-variant-numeric:tabular-nums">' + esc(a2.externalId) + '</span>' +
+            (a2.name ? '<span class="mk-hint">' + esc(a2.name) + '</span>' : '') +
+            (a2.country ? '<span class="mk-hint">' + esc(a2.country) + '</span>' : '') +
+            '<span class="sp" style="margin-inline-start:auto"></span>' +
+            '<button class="mk-btn mk-btn--sm" data-act="pr-rmacc" data-pid="' + p.id + '" data-aid="' + a2.id + '">' + window.T("pr.remove") + '</button>' +
+            '</div>';
+        }).join("") : '<p class="mk-hint">' + window.T("l.none") + '</p>') + '</div>' +
+        '<div class="mk-grid2" style="gap:8px">' +
+          '<input class="mk-in" id="pa_meta_' + p.id + '" placeholder="' + esc(window.T("pr.addMeta")) + '">' +
+          '<button class="mk-btn mk-btn--sm" data-act="pr-addacc" data-pid="' + p.id + '" data-provider="meta">+ Meta</button>' +
+          '<input class="mk-in" id="pa_google_' + p.id + '" placeholder="' + esc(window.T("pr.addGoogle")) + '">' +
+          '<button class="mk-btn mk-btn--sm" data-act="pr-addacc" data-pid="' + p.id + '" data-provider="google">+ Google</button>' +
+        '</div>' +
+        '<div class="acts"><button class="mk-btn mk-btn--sm mk-btn--pri" data-act="pr-sync" data-pid="' + p.id + '">' + window.T("pr.syncProject") + '</button></div>' +
+        '</div>';
+    }).join("") : '';
+    var empty2 = '<div class="mk-empty"><h3>' + window.T("pr.none") + '</h3><p>' + window.T("pr.noneBody") + '</p></div>';
+    var form = '<div class="mk-card" style="background:var(--panel-2);margin-top:14px">' +
+      '<div class="mk-card__h"><h3>' + window.T("pr.add") + '</h3></div>' +
+      '<div class="mk-grid2">' +
+      '<div class="mk-fld"><label class="mk-lbl">' + window.T("pr.name") + '</label><input class="mk-in" id="pr_name" placeholder="CanadaV"></div>' +
+      '<div class="mk-fld"><label class="mk-lbl">' + window.T("pr.currency") + '</label><input class="mk-in" id="pr_currency" placeholder="USD"></div>' +
+      '<div class="mk-fld"><label class="mk-lbl">' + window.T("pr.googleId") + '</label><input class="mk-in" id="pr_gid" placeholder="152-140-5705"></div>' +
+      '<div class="mk-fld"><label class="mk-lbl">' + window.T("pr.loginId") + '</label><input class="mk-in" id="pr_lid" placeholder=""></div>' +
+      '</div>' +
+      '<div style="margin-top:12px"><button class="mk-btn mk-btn--pri mk-btn--sm" data-act="pr-create">' + window.T("pr.add") + '</button></div>' +
+      '</div>';
+    return '<p class="mk-hint" style="margin-bottom:14px">' + window.T("pr.sub") + '</p>' +
+      (list.length ? '<div class="mk-conns">' + rows + '</div>' : empty2) + form;
+  }
+
   /* ---------------- settings ---------------- */
   var setTab = "conns";
   function settings() {
     var s = D.state();
-    var TABS = [["conns", "se.conns"], ["business", "se.business"], ["depts", "se.depts"], ["targets", "se.targets"], ["assessment", "se.assessment"], ["data", "se.data"]];
+    var TABS = [["projects", "pr.title"], ["conns", "se.conns"], ["business", "se.business"], ["depts", "se.depts"], ["targets", "se.targets"], ["assessment", "se.assessment"], ["data", "se.data"]];
     var head = '<div class="mk-h1">' + window.T("se.title") + '</div>' +
       '<div class="mk-tabs mk-sec">' + TABS.map(function (t) {
         return '<button class="mk-tab ' + (setTab === t[0] ? "on" : "") + '" data-settab="' + t[0] + '">' + window.T(t[1]) + '</button>';
       }).join("") + '</div>';
     var body = "";
-    if (setTab === "conns") {
+    if (setTab === "projects") body = card(window.T("pr.title"), projectsPanel());
+    else if (setTab === "conns") {
       var srv = "";
       if (window.MKT_REMOTE && window.MKT_REMOTE.serverMode()) {
         var rem = D.remote();
@@ -1073,7 +1131,7 @@ window.MKT_VIEWS = (function () {
     team: team, teamDetail: teamDetail, issues: issues, issueDetail: issueDetail,
     tasks: tasks, web: web, reputation: reputation, knowledge: knowledge,
     implementation: implementation, reports: reports, settings: settings,
-    forms: forms, setSettingsTab: setSettingsTab, setLeadFilter: setLeadFilter, setIssFilter: setIssFilter,
+    forms: forms, projectsPanel: projectsPanel, setSettingsTab: setSettingsTab, setLeadFilter: setLeadFilter, setIssFilter: setIssFilter,
     grow: grow
   };
 })();

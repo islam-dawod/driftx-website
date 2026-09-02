@@ -60,6 +60,20 @@ if ($action !== '' && !$enabled) {
       if ($stmt === '' || str_starts_with($stmt, '--')) continue;
       dx_db()->exec($stmt);
     }
+    /* columns added after the first release — MySQL has no ADD COLUMN IF NOT EXISTS */
+    $addCol = function (string $table, string $col, string $ddl) use (&$msgs) {
+      $r = dx_one(
+        'SELECT COUNT(*) AS n FROM information_schema.columns
+         WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?',
+        [$table, $col]
+      );
+      if ((int) ($r['n'] ?? 0) === 0) {
+        dx_db()->exec('ALTER TABLE `' . $table . '` ADD COLUMN ' . $ddl);
+        $msgs[] = 'Added column ' . $table . '.' . $col;
+      }
+    };
+    $addCol('ad_accounts', 'project_id', '`project_id` INT UNSIGNED NULL, ADD KEY `k_acc_proj` (`project_id`)');
+    $addCol('sync_log', 'project_id', '`project_id` INT UNSIGNED NULL');
     $msgs[] = 'Tables created or already present.';
     $tablesOk = true;
   } catch (Throwable $e) {
