@@ -120,6 +120,7 @@ window.DRIFTX_I18N = {
     "contact.does": "What does your business do?", "contact.challenge": "What is your biggest challenge right now?",
     "contact.focus": "Where should we focus?", "contact.notsure": "Not Sure Yet",
     "contact.submit": "Start The Conversation", "contact.note": "We'll get back to you within one business day.",
+    "contact.err": "Couldn't send — please email info@driftx.co directly.",
     "contact.fill": "Please add your name and email.", "contact.sending": "Sending…", "contact.thanks": "Thanks — we'll get back to you within one business day.", "contact.mailapp": "Opening your email app…",
 
     "hero.lead": "We help businesses sell better, market smarter, and use technology & AI to move ahead.",
@@ -274,6 +275,7 @@ window.DRIFTX_I18N = {
     "contact.does": "מה העסק שלך עושה?", "contact.challenge": "מהו האתגר הגדול ביותר כרגע?",
     "contact.focus": "על מה נתמקד?", "contact.notsure": "עדיין לא בטוח",
     "contact.submit": "בוא נתחיל שיחה", "contact.note": "נחזור אליך תוך יום עסקים אחד.",
+    "contact.err": "לא הצלחנו לשלוח — נא לכתוב ישירות ל-info@driftx.co.",
     "contact.fill": "נא להזין שם ואימייל.", "contact.sending": "שולח…", "contact.thanks": "תודה — נחזור אליך תוך יום עסקים אחד.", "contact.mailapp": "פותח את אפליקציית האימייל…",
 
     "hero.lead": "אנחנו עוזרים לעסקים למכור טוב יותר, לשווק חכם יותר ולהשתמש בטכנולוגיה ו-AI כדי להתקדם.",
@@ -428,6 +430,7 @@ window.DRIFTX_I18N = {
     "contact.does": "ماذا يعمل عملك؟", "contact.challenge": "ما أكبر تحدٍّ تواجهه الآن؟",
     "contact.focus": "أين ينبغي أن نركّز؟", "contact.notsure": "لست متأكّداً بعد",
     "contact.submit": "لنبدأ الحوار", "contact.note": "سنعاود التواصل خلال يوم عمل واحد.",
+    "contact.err": "تعذّر الإرسال — يرجى المراسلة مباشرةً على info@driftx.co.",
     "contact.fill": "يرجى إدخال الاسم والبريد الإلكتروني.", "contact.sending": "جارٍ الإرسال…", "contact.thanks": "شكراً — سنعاود التواصل خلال يوم عمل واحد.", "contact.mailapp": "جارٍ فتح تطبيق البريد…",
 
     "hero.lead": "نساعد الأعمال على البيع بشكل أفضل، والتسويق بذكاء، واستخدام التقنية والذكاء الاصطناعي للتقدّم.",
